@@ -1,2 +1,6 @@
-<h1>Welcome to SvelteKit</h1>
-<p>Visit <a href="https://kit.svelte.dev">kit.svelte.dev</a> to read the documentation</p>
+<svelte:head>
+	<title>MRM Explorer</title>
+	<meta name="description" content="Application for investigating MRM outputs" />
+</svelte:head>
+
+<h1>MRM Explorer</h1>
