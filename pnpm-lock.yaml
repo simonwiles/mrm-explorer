@@ -18,8 +18,8 @@ devDependencies:
     specifier: ^8.56.5
     version: 8.56.5
   carbon-components-svelte:
-    specifier: ^0.82.11
-    version: 0.82.11
+    specifier: 1.0.0-next.1
+    version: 1.0.0-next.1
   eslint:
     specifier: ^8.57.0
     version: 8.57.0
@@ -683,8 +683,8 @@ packages:
     engines: {node: '>=6'}
     dev: true
 
-  /carbon-components-svelte@0.82.11:
-    resolution: {integrity: sha512-jCCQz7W+fEqPj7FsS8P4lG+SVWhruO+5GHWjqbzq6hDMfo9A0yBUcrTPqrpsOSus7S96x5sPQvIECP195Xkrew==}
+  /carbon-components-svelte@1.0.0-next.1:
+    resolution: {integrity: sha512-Q9CCYKI448SJSaQIKjqDx9DkCBZoYKEoGRb4tCr2YOXZqt1+4P71mLjtp72qy1rCObWt8AYo3ceAF3hEDi78kA==}
     dependencies:
       flatpickr: 4.6.9
     dev: true
