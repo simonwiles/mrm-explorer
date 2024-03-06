@@ -6,19 +6,19 @@ settings:
 
 devDependencies:
   '@sveltejs/adapter-auto':
-    specifier: ^3.0.0
+    specifier: ^3.1.1
     version: 3.1.1(@sveltejs/kit@2.5.2)
   '@sveltejs/kit':
-    specifier: ^2.0.0
+    specifier: ^2.5.2
     version: 2.5.2(@sveltejs/vite-plugin-svelte@3.0.2)(svelte@4.2.12)(vite@5.1.5)
   '@sveltejs/vite-plugin-svelte':
-    specifier: ^3.0.0
+    specifier: ^3.0.2
     version: 3.0.2(svelte@4.2.12)(vite@5.1.5)
   '@types/eslint':
-    specifier: ^8.56.0
+    specifier: ^8.56.5
     version: 8.56.5
   eslint:
-    specifier: ^8.56.0
+    specifier: ^8.57.0
     version: 8.57.0
   eslint-config-prettier:
     specifier: ^9.1.0
@@ -27,22 +27,22 @@ devDependencies:
     specifier: ^2.35.1
     version: 2.35.1(eslint@8.57.0)(svelte@4.2.12)
   prettier:
-    specifier: ^3.1.1
+    specifier: ^3.2.5
     version: 3.2.5
   prettier-plugin-svelte:
-    specifier: ^3.1.2
+    specifier: ^3.2.2
     version: 3.2.2(prettier@3.2.5)(svelte@4.2.12)
   svelte:
-    specifier: ^4.2.7
+    specifier: ^4.2.12
     version: 4.2.12
   svelte-check:
-    specifier: ^3.6.0
+    specifier: ^3.6.6
     version: 3.6.6(postcss@8.4.35)(svelte@4.2.12)
   typescript:
-    specifier: ^5.0.0
+    specifier: ^5.4.2
     version: 5.4.2
   vite:
-    specifier: ^5.0.3
+    specifier: ^5.1.5
     version: 5.1.5
 
 packages:
