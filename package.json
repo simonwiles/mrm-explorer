@@ -27,5 +27,10 @@
 		"typescript": "^5.4.2",
 		"vite": "^5.1.5"
 	},
-	"type": "module"
+	"type": "module",
+	"pnpm": {
+		"patchedDependencies": {
+			"carbon-components-svelte@1.0.0-next.1": "patches/carbon-components-svelte@1.0.0-next.1.patch"
+		}
+	}
 }

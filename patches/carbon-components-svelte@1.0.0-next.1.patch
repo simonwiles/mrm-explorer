@@ -1,0 +1,82 @@
+diff --git a/src/ContentSwitcher/Switch.svelte b/src/ContentSwitcher/Switch.svelte
+index 40b52c71db42fcb52d8478e8837fa38161d52926..925f9aa748323138523014690a45d0b928cdb4a6 100644
+--- a/src/ContentSwitcher/Switch.svelte
++++ b/src/ContentSwitcher/Switch.svelte
+@@ -23,8 +23,8 @@
+ 
+   ctx.add({ id, text, selected });
+ 
+-  const unsubscribe = ctx.currentId.subscribe(($) => {
+-    selected = $ === id;
++  const unsubscribe = ctx.currentId.subscribe((_) => {
++    selected = _ === id;
+   });
+ 
+   afterUpdate(() => {
+@@ -45,8 +45,8 @@
+   role="tab"
+   tabindex="{selected ? '0' : '-1'}"
+   aria-selected="{selected}"
+-  disabled="{disabled}"
+-  id="{id}"
++  {disabled}
++  {id}
+   class:bx--content-switcher-btn="{true}"
+   class:bx--content-switcher--selected="{selected}"
+   {...$$restProps}
+diff --git a/src/Link/Link.svelte b/src/Link/Link.svelte
+index fc680c3e20a788130bb4ed215564d44930a581c1..74e49dcdee4e8d641e7da297191e59c9030ebcdd 100644
+--- a/src/Link/Link.svelte
++++ b/src/Link/Link.svelte
+@@ -36,7 +36,8 @@
+ <!-- svelte-ignore a11y-mouse-events-have-key-events -->
+ {#if disabled}
+   <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
+-  <p
++  <a
++    aria-disabled="true"
+     bind:this="{ref}"
+     class:bx--link="{true}"
+     class:bx--link--disabled="{disabled}"
+@@ -56,7 +57,7 @@
+         </slot>
+       </div>
+     {/if}
+-  </p>
++  </a>
+ {:else}
+   <a
+     bind:this="{ref}"
+@@ -67,7 +68,7 @@
+     class:bx--link--sm="{size === 'sm'}"
+     class:bx--link--lg="{size === 'lg'}"
+     rel="{$$restProps.target === '_blank' ? 'noopener noreferrer' : undefined}"
+-    href="{href}"
++    {href}
+     {...$$restProps}
+     on:click
+     on:mouseover
+diff --git a/src/ProgressIndicator/ProgressIndicator.svelte b/src/ProgressIndicator/ProgressIndicator.svelte
+index 688a797ad89d21a8521ac49f5e161918c890b31a..5e6709b1c82f70e4d80bf8b215a94977d3f696ff 100644
+--- a/src/ProgressIndicator/ProgressIndicator.svelte
++++ b/src/ProgressIndicator/ProgressIndicator.svelte
+@@ -16,8 +16,8 @@
+ 
+   const dispatch = createEventDispatcher();
+   const steps = writable([]);
+-  const stepsById = derived(steps, ($) =>
+-    $.reduce((a, c) => ({ ...a, [c.id]: c }), {})
++  const stepsById = derived(steps, (_) =>
++    _.reduce((a, c) => ({ ...a, [c.id]: c }), {}),
+   );
+   const preventChangeOnClickStore = writable(preventChangeOnClick);
+ 
+@@ -58,7 +58,7 @@
+     _.map((step, i) => ({
+       ...step,
+       current: i === currentIndex,
+-    }))
++    })),
+   );
+   $: preventChangeOnClickStore.set(preventChangeOnClick);
+ </script>
