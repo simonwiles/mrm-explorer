@@ -34,12 +34,6 @@
 		image = false;
 	}
 
-	$effect.pre(async () => {
-		const images = await db.images.toArray();
-		if (images.length > 0) {
-			image = images[0];
-		} else {
-			image = false;
 	/**
 	 * Applies a non-passive wheel event listener to the given element
 	 * (event modifiers are deprecated in Svelte 5, and we can't express
@@ -73,7 +67,19 @@
 			}
 		};
 	}
+
+	$effect(() => {
+		// $effect doesn't work properly with async functions
+		// https://github.com/sveltejs/svelte/issues/9520#issuecomment-1817092724
+		async function loadImage() {
+			const images = await db.images.toArray();
+			if (images.length > 0) {
+				image = images[0];
+			} else {
+				image = false;
+			}
 		}
+		loadImage();
 	});
 </script>
 
