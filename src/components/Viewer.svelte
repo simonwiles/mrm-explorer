@@ -72,6 +72,7 @@
 			<Column>
 				<Toolbar size="sm">
 					<ToolbarContent>
+						<div class="image-name">{image.name}</div>
 						<Button
 							icon={CloseLarge}
 							iconDescription="Close"
@@ -132,8 +133,14 @@
 
 	.toast {
 		position: absolute;
-		top: calc(48px + 1rem);
 		right: 1rem;
+		top: calc(48px + 1rem);
+	}
+
+	.image-name {
+		align-self: center;
+		flex-grow: 1;
+		padding: 0 1rem;
 	}
 
 	.image-container {
