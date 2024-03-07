@@ -39,6 +39,39 @@
 			image = images[0];
 		} else {
 			image = false;
+	/**
+	 * Applies a non-passive wheel event listener to the given element
+	 * (event modifiers are deprecated in Svelte 5, and we can't express
+	 *  "nonpassive" as a wrapper function.
+	 *  see: https://svelte-5-preview.vercel.app/docs/event-handlers#event-modifiers)
+	 * @param {HTMLElement} node
+	 */
+	function wheelZoom(node) {
+		/** @type {EventListenerOptions & { passive: Boolean }} */
+		const options = { passive: false };
+
+		/**
+		 * @param {WheelEvent} event
+		 */
+		function handler(event) {
+			event.preventDefault();
+			if (event.deltaY < 0) {
+				imageToX = event.clientX;
+				imageToY = event.clientY;
+				imageScale *= 1.1;
+			} else {
+				imageScale /= 1.1;
+				if (imageScale < 1) imageScale = 1;
+			}
+		}
+
+		node.addEventListener('wheel', handler, options);
+		return {
+			destroy() {
+				node.removeEventListener('wheel', handler, options);
+			}
+		};
+	}
 		}
 	});
 </script>
@@ -89,17 +122,7 @@
 				<div
 					class="image-container"
 					style="--scale: {imageScale}; --transform-origin-X: {imageToX}px; --transform-origin-Y: {imageToY}px"
-					on:wheel|nonpassive|preventDefault={(e) => {
-						console.log(e);
-						imageToX = e.layerX;
-						imageToY = e.layerY;
-						if (e.deltaY < 0) {
-							imageScale *= 1.1;
-						} else {
-							imageScale /= 1.1;
-							if (imageScale < 1) imageScale = 1;
-						}
-					}}
+					use:wheelZoom
 				>
 					<img src={image.image} alt={image.name} />
 				</div>
