@@ -14,6 +14,7 @@
 	let imageToY = $state(0);
 
 	/**
+	 * Add an image to the database
 	 * @param {string} imgName
 	 * @param {string | ArrayBuffer | null} imgData
 	 */
