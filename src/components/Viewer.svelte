@@ -9,10 +9,6 @@
 	let showNotification = $state();
 	let image = $state();
 
-	let imageScale = $state(1);
-	let imageToX = $state(0);
-	let imageToY = $state(0);
-
 	/**
 	 * Add an image to the database
 	 * @param {string} imgName
@@ -45,19 +41,24 @@
 		/** @type {EventListenerOptions & { passive: Boolean }} */
 		const options = { passive: false };
 
+		let scale = 1;
+		let transformOrigin = [0, 0];
+
 		/**
 		 * @param {WheelEvent} event
 		 */
 		function handler(event) {
 			event.preventDefault();
 			if (event.deltaY < 0) {
-				imageToX = event.clientX;
-				imageToY = event.clientY;
-				imageScale *= 1.1;
+				transformOrigin = [event.clientX - node.offsetLeft, event.clientY - node.offsetTop];
+				scale *= 1.1;
 			} else {
-				imageScale /= 1.1;
-				if (imageScale < 1) imageScale = 1;
+				scale /= 1.1;
+				if (scale < 1) scale = 1;
 			}
+			node.style.setProperty('--scale', `${scale.toFixed(4)}`);
+			node.style.setProperty('--transform-origin-X', `${transformOrigin[0]}px`);
+			node.style.setProperty('--transform-origin-Y', `${transformOrigin[1]}px`);
 		}
 
 		node.addEventListener('wheel', handler, options);
@@ -126,12 +127,8 @@
 		</Row>
 		<Row>
 			<Column>
-				<div
-					class="image-container"
-					style="--scale: {imageScale}; --transform-origin-X: {imageToX}px; --transform-origin-Y: {imageToY}px"
-					use:wheelZoom
-				>
-					<img src={image.image} alt={image.name} />
+				<div class="image-container">
+					<img src={image.image} alt={image.name} use:wheelZoom />
 				</div>
 			</Column>
 		</Row>
@@ -177,9 +174,10 @@
 		overflow: hidden;
 
 		img {
-			width: 100%;
 			transform: scale(var(--scale));
 			transform-origin: var(--transform-origin-X) var(--transform-origin-Y);
+			transition: transform 0.1s linear;
+			width: 100%;
 		}
 	}
 </style>
