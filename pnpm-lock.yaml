@@ -28,6 +28,9 @@ devDependencies:
   carbon-icons-svelte:
     specifier: ^12.5.0
     version: 12.5.0
+  dexie:
+    specifier: 4.0.1-beta.14
+    version: 4.0.1-beta.14
   eslint:
     specifier: ^8.57.0
     version: 8.57.0
@@ -793,6 +796,10 @@ packages:
 
   /devalue@4.3.2:
     resolution: {integrity: sha512-KqFl6pOgOW+Y6wJgu80rHpo2/3H07vr8ntR9rkkFIRETewbf5GaYYcakYfiKz89K+sLsuPkQIZaXDMjUObZwWg==}
+    dev: true
+
+  /dexie@4.0.1-beta.14:
+    resolution: {integrity: sha512-1Glgs4nyHUriknstBku1T0Qz9qxJbHQy49JFeDEacHQK+XljN/sn1zyIH/HwouQ7a+WAdWHInm51i0GqWOAyHg==}
     dev: true
 
   /doctrine@3.0.0:
