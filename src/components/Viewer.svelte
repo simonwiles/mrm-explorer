@@ -9,6 +9,10 @@
 	let showNotification = $state();
 	let image = $state();
 
+	let imageScale = $state(1);
+	let imageToX = $state(0);
+	let imageToY = $state(0);
+
 	/**
 	 * @param {string} imgName
 	 * @param {string | ArrayBuffer | null} imgData
@@ -80,7 +84,25 @@
 			</Column>
 		</Row>
 		<Row>
-			<Column><img src={image.image} alt={image.name} /></Column>
+			<Column>
+				<div
+					class="image-container"
+					style="--scale: {imageScale}; --transform-origin-X: {imageToX}px; --transform-origin-Y: {imageToY}px"
+					on:wheel|nonpassive|preventDefault={(e) => {
+						console.log(e);
+						imageToX = e.layerX;
+						imageToY = e.layerY;
+						if (e.deltaY < 0) {
+							imageScale *= 1.1;
+						} else {
+							imageScale /= 1.1;
+							if (imageScale < 1) imageScale = 1;
+						}
+					}}
+				>
+					<img src={image.image} alt={image.name} />
+				</div>
+			</Column>
 		</Row>
 	</Grid>
 {/if}
@@ -112,5 +134,15 @@
 		position: absolute;
 		top: calc(48px + 1rem);
 		right: 1rem;
+	}
+
+	.image-container {
+		overflow: hidden;
+
+		img {
+			width: 100%;
+			transform: scale(var(--scale));
+			transform-origin: var(--transform-origin-X) var(--transform-origin-Y);
+		}
 	}
 </style>
