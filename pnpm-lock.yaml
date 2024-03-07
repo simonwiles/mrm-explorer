@@ -25,6 +25,9 @@ devDependencies:
   carbon-components-svelte:
     specifier: 1.0.0-next.1
     version: 1.0.0-next.1(patch_hash=kzn3yvwwv75kld6me26azgs7qe)
+  carbon-icons-svelte:
+    specifier: ^12.5.0
+    version: 12.5.0
   eslint:
     specifier: ^8.57.0
     version: 8.57.0
@@ -694,6 +697,10 @@ packages:
       flatpickr: 4.6.9
     dev: true
     patched: true
+
+  /carbon-icons-svelte@12.5.0:
+    resolution: {integrity: sha512-f7iTJ5euF9e6rniXasUaLbueNg/19poywJiiBVSsXg8dMv3D71jOun69mKxGeVvL8Rh4Xw5I6jieHxrXz43s3g==}
+    dev: true
 
   /chalk@4.1.2:
     resolution: {integrity: sha512-oKnbhFyRIXpUuez8iBMmyEa4nbj4IOQyuhc/wy9kY7/WVPcwIO9VA668Pu8RkO7+0G76SLROeyw9CpQ061i4mA==}
