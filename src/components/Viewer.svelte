@@ -1,37 +1,49 @@
 <script>
+	import { ToastNotification, Loading } from 'carbon-components-svelte';
 	import { FileUploaderDropContainer } from 'carbon-components-svelte';
+	import { Grid, Row, Column, Toolbar, ToolbarContent, Button } from 'carbon-components-svelte';
+	import { CloseLarge } from 'carbon-icons-svelte';
 	import { db } from '$lib/db.js';
+	import { fade } from 'svelte/transition';
 
-	let imgName = $state();
-	let imgData = $state();
+	let showNotification = $state();
+	let image = $state();
 
 	/**
-	 * @param {string} _imgName
-	 * @param {string | ArrayBuffer | null} _imgData
+	 * @param {string} imgName
+	 * @param {string | ArrayBuffer | null} imgData
 	 */
-	async function addImage(_imgName, _imgData) {
-		imgName = _imgName;
-		imgData = _imgData;
+	async function addImage(imgName, imgData) {
 		try {
 			const id = await db.images.add({ name: imgName, image: imgData });
 			console.log(`Image ${imgName} successfully added. Got id ${id}`);
+			image = { id: id, name: imgName, image: imgData };
 		} catch (error) {
 			console.error(`Failed to add ${imgName}: ${error}`);
 		}
 	}
 
+	async function removeImage() {
+		await db.images.delete(image.id);
+		showNotification = image.name;
+		image = false;
+	}
+
 	$effect.pre(async () => {
 		const images = await db.images.toArray();
 		if (images.length > 0) {
-			imgName = images[0].name;
-			imgData = images[0].image;
+			image = images[0];
 		} else {
-			imgData = false;
+			image = false;
 		}
 	});
 </script>
 
-{#if imgData === false}
+{#if image === undefined}
+	<Loading />
+{/if}
+
+{#if image === false}
 	<FileUploaderDropContainer
 		on:change={({ detail: files }) => {
 			const file = files[0];
@@ -50,8 +62,39 @@
 	</FileUploaderDropContainer>
 {/if}
 
-{#if imgData}
-	<img src={imgData} alt={imgName} />
+{#if image}
+	<Grid fullWidth>
+		<Row>
+			<Column>
+				<Toolbar size="sm">
+					<ToolbarContent>
+						<Button
+							icon={CloseLarge}
+							iconDescription="Close"
+							on:click={removeImage}
+							tooltipPosition="left"
+							tooltipAlignment="end"
+						/>
+					</ToolbarContent>
+				</Toolbar>
+			</Column>
+		</Row>
+		<Row>
+			<Column><img src={image.image} alt={image.name} /></Column>
+		</Row>
+	</Grid>
+{/if}
+
+{#if showNotification}
+	<div class="toast" transition:fade>
+		<ToastNotification
+			timeout={3000}
+			kind="success"
+			title="Image removed."
+			subtitle={`Removed image: ${showNotification}`}
+			on:close={() => (showNotification = false)}
+		/>
+	</div>
 {/if}
 
 <style>
@@ -63,5 +106,11 @@
 		text-align: center;
 		vertical-align: middle;
 		width: 100%;
+	}
+
+	.toast {
+		position: absolute;
+		top: calc(48px + 1rem);
+		right: 1rem;
 	}
 </style>
