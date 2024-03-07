@@ -1,11 +1,37 @@
 <script>
 	import { FileUploaderDropContainer } from 'carbon-components-svelte';
+	import { db } from '$lib/db.js';
 
 	let imgName = $state();
 	let imgData = $state();
+
+	/**
+	 * @param {string} _imgName
+	 * @param {string | ArrayBuffer | null} _imgData
+	 */
+	async function addImage(_imgName, _imgData) {
+		imgName = _imgName;
+		imgData = _imgData;
+		try {
+			const id = await db.images.add({ name: imgName, image: imgData });
+			console.log(`Image ${imgName} successfully added. Got id ${id}`);
+		} catch (error) {
+			console.error(`Failed to add ${imgName}: ${error}`);
+		}
+	}
+
+	$effect.pre(async () => {
+		const images = await db.images.toArray();
+		if (images.length > 0) {
+			imgName = images[0].name;
+			imgData = images[0].image;
+		} else {
+			imgData = false;
+		}
+	});
 </script>
 
-{#if !imgData}
+{#if imgData === false}
 	<FileUploaderDropContainer
 		on:change={({ detail: files }) => {
 			const file = files[0];
@@ -13,13 +39,14 @@
 				alert('Only image files are accepted');
 				return;
 			}
-			imgName = file.name;
 			const reader = new FileReader();
-			reader.addEventListener('load', () => (imgData = reader.result), false);
+			reader.addEventListener('load', () => addImage(file.name, reader.result), false);
 			reader.readAsDataURL(file);
 		}}
 	>
-		<span slot="labelText">Drag and drop map or other image here<br />(or click to upload)</span>
+		<span class="file-upload-dropzone" slot="labelText">
+			Drag and drop map or other image here<br />(or click to upload)
+		</span>
 	</FileUploaderDropContainer>
 {/if}
 
@@ -28,7 +55,7 @@
 {/if}
 
 <style>
-	span {
+	.file-upload-dropzone {
 		align-items: center;
 		display: flex;
 		height: 100%;
