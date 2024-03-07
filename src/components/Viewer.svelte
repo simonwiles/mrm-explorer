@@ -1,11 +1,11 @@
 <script>
 	import { FileUploaderDropContainer } from 'carbon-components-svelte';
 
-	let imgUrl = $state();
 	let imgName = $state();
+	let imgData = $state();
 </script>
 
-{#if !imgUrl}
+{#if !imgData}
 	<FileUploaderDropContainer
 		on:change={({ detail: files }) => {
 			const file = files[0];
@@ -14,15 +14,17 @@
 				return;
 			}
 			imgName = file.name;
-			imgUrl = window.URL.createObjectURL(file);
+			const reader = new FileReader();
+			reader.addEventListener('load', () => (imgData = reader.result), false);
+			reader.readAsDataURL(file);
 		}}
 	>
 		<span slot="labelText">Drag and drop map or other image here<br />(or click to upload)</span>
 	</FileUploaderDropContainer>
 {/if}
 
-{#if imgUrl}
-	<img src={imgUrl} alt={imgName} />
+{#if imgData}
+	<img src={imgData} alt={imgName} />
 {/if}
 
 <style>
