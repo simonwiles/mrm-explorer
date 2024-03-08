@@ -9,6 +9,8 @@
 	let showNotification = $state();
 	let image = $state();
 
+	let svg = $state();
+
 	/**
 	 * Add an image to the database
 	 * @param {string} imgName
@@ -81,6 +83,46 @@
 			}
 		};
 	}
+
+	const scale = 4416 / 1000;
+
+	/**
+	 * @param {number[][]} vertices
+	 * @param {number} scale
+	 * @returns {number[][]}
+	 */
+	const scale_coords = (vertices, scale) => vertices.map(([x, y]) => [x / scale, 1 - y / scale]);
+
+	/**
+	 * @param {any} feature
+	 * @param {number} i
+	 */
+	const createFeaturePath = (feature, i) => {
+		const featurePath = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+		const vertices = scale_coords(feature.geometry.coordinates[0], scale);
+		const path = [];
+		path.push(`M ${vertices[0][0]} ${vertices[0][1]}`);
+		vertices.slice(1).forEach(([x, y]) => path.push(`L ${x} ${y}`));
+		path.push('Z');
+		featurePath.setAttribute('d', path.join(' '));
+		featurePath.setAttribute('data-idx', `${i}`);
+		featurePath.setAttribute('data-text', feature.properties.text);
+		featurePath.setAttribute('data-score', feature.properties.score);
+		featurePath.setAttribute(
+			'data-tippy-content',
+			`text: ${feature.properties.text}<br>score: ${feature.properties.score}`
+		);
+		return featurePath;
+	};
+
+	$effect(() => {
+		if (image && image.mrm_json && svg) {
+			image.mrm_json.features.forEach((/** @type {Object} */ feature, /** @type {number} */ i) => {
+				const featurePath = createFeaturePath(feature, i);
+				svg.appendChild(featurePath);
+			});
+		}
+	});
 
 	$effect(() => {
 		// $effect doesn't work properly with async functions
@@ -159,8 +201,11 @@
 		</Row>
 		<Row>
 			<Column>
-				<div class="image-container">
-					<img src={image.image} alt={image.name} use:wheelZoom />
+				<div class="image-container" use:wheelZoom>
+					<img src={image.image} alt={image.name} />
+					{#if image.mrm_json}
+						<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 750" bind:this={svg}></svg>
+					{/if}
 				</div>
 			</Column>
 		</Row>
@@ -216,13 +261,41 @@
 	}
 
 	.image-container {
+		display: grid;
+		grid-template-columns: auto;
+		grid-template-rows: auto;
 		overflow: hidden;
+		position: relative;
 
 		img {
 			transform: scale(var(--scale));
 			transform-origin: var(--transform-origin-X) var(--transform-origin-Y);
 			transition: transform 0.1s linear;
 			width: 100%;
+		}
+
+		svg {
+			max-width: 100%;
+			position: absolute;
+			transform: scale(var(--scale));
+			transform-origin: var(--transform-origin-X) var(--transform-origin-Y);
+			transition: transform 0.1s linear;
+		}
+
+		svg :global(path) {
+			fill: transparent;
+			stroke: #44f8;
+		}
+
+		svg :global(path.marked) {
+			opacity: 0.6;
+			stroke: lime;
+		}
+
+		svg :global(path.active),
+		svg :global(path:hover) {
+			opacity: 1;
+			stroke: hotpink;
 		}
 	}
 </style>
