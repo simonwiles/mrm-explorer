@@ -2,7 +2,7 @@
 	import { ToastNotification, Loading } from 'carbon-components-svelte';
 	import { FileUploaderDropContainer } from 'carbon-components-svelte';
 	import { Grid, Row, Column, Toolbar, ToolbarContent, Button } from 'carbon-components-svelte';
-	import { CloseLarge } from 'carbon-icons-svelte';
+	import { CloseLarge, Upload } from 'carbon-icons-svelte';
 	import { db } from '$lib/db.js';
 	import { fade } from 'svelte/transition';
 
@@ -28,6 +28,19 @@
 		await db.images.delete(image.id);
 		showNotification = image.name;
 		image = false;
+	}
+
+	/**
+	 * Add an image to the database
+	 * @param {string} imgJson
+	 */
+	async function addJson(imgJson) {
+		try {
+			await db.images.update(image.id, { mrm_json: imgJson });
+			image.mrm_json = imgJson;
+		} catch (error) {
+			console.error(`Failed to add json: ${error}`);
+		}
 	}
 
 	/**
@@ -114,6 +127,25 @@
 				<Toolbar size="sm">
 					<ToolbarContent>
 						<div class="image-name">{image.name}</div>
+						{#if !image.mrm_json}
+							<FileUploaderDropContainer
+								labelText="Add JSON"
+								class="add-json"
+								on:change={({ detail: files }) => {
+									const file = files[0];
+									if (
+										!file.type ||
+										!['application/geo+json', 'application/json'].includes(file.type)
+									) {
+										alert('Only JSON / GEOJSON files are accepted');
+										return;
+									}
+									const reader = new FileReader();
+									reader.addEventListener('load', () => addJson(JSON.parse(reader.result)), false);
+									reader.readAsText(file);
+								}}
+							></FileUploaderDropContainer>
+						{/if}
 						<Button
 							icon={CloseLarge}
 							iconDescription="Close"
@@ -168,6 +200,19 @@
 		align-self: center;
 		flex-grow: 1;
 		padding: 0 1rem;
+	}
+
+	:global(.add-json) {
+		inline-size: auto;
+		overflow: hidden;
+	}
+
+	:global(.add-json .bx--file-browse-btn) {
+		max-height: 100%;
+	}
+
+	:global(.add-json .bx--file__drop-container) {
+		border: 0;
 	}
 
 	.image-container {
