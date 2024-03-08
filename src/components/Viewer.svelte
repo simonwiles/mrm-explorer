@@ -2,8 +2,8 @@
 	import { ToastNotification, Loading } from 'carbon-components-svelte';
 	import { FileUploaderDropContainer } from 'carbon-components-svelte';
 	import { Grid, Row, Column, Toolbar, ToolbarContent, Button } from 'carbon-components-svelte';
-	import { CloseLarge, Upload } from 'carbon-icons-svelte';
-	import { db } from '$lib/db.js';
+	import { CloseLarge } from 'carbon-icons-svelte';
+	import { db } from '$lib/db';
 	import { fade } from 'svelte/transition';
 
 	let showNotification = $state();
