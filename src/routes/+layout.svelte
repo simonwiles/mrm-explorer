@@ -29,4 +29,8 @@
 		--bx-button-primary-active: #436140;
 		--bx-link-primary: #76c46d;
 	}
+
+	:global(.tippy-box) {
+		box-shadow: 0 0 4px 0px white;
+	}
 </style>

@@ -5,6 +5,7 @@
 	import { CloseLarge } from 'carbon-icons-svelte';
 	import { db } from '$lib/db';
 	import { fade } from 'svelte/transition';
+	import { tooltip } from '$lib/tooltip-action';
 
 	let showNotification = $state();
 	let image = $state();
@@ -120,6 +121,12 @@
 			image.mrm_json.features.forEach((/** @type {Object} */ feature, /** @type {number} */ i) => {
 				const featurePath = createFeaturePath(feature, i);
 				svg.appendChild(featurePath);
+
+				tooltip(featurePath, {
+					placement: 'top',
+					arrow: true,
+					allowHTML: true
+				});
 			});
 		}
 	});
