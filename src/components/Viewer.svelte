@@ -1,13 +1,12 @@
 <script>
-	import { ToastNotification, Loading } from 'carbon-components-svelte';
+	import { Loading } from 'carbon-components-svelte';
 	import { FileUploaderDropContainer } from 'carbon-components-svelte';
 	import { Grid, Row, Column, Toolbar, ToolbarContent, Button } from 'carbon-components-svelte';
 	import { CloseLarge } from 'carbon-icons-svelte';
 	import { db } from '$lib/db';
-	import { fade } from 'svelte/transition';
 	import { tooltip } from '$lib/tooltip-action';
+	import { notify } from '@components/Notifications.svelte';
 
-	let showNotification = $state();
 	let image = $state();
 
 	let svg = $state();
@@ -29,7 +28,7 @@
 
 	async function removeImage() {
 		await db.images.delete(image.id);
-		showNotification = image.name;
+		notify({ title: 'Image removed', subtitle: `Image "${image.name}" removed` });
 		image = false;
 	}
 
@@ -217,18 +216,6 @@
 			</Column>
 		</Row>
 	</Grid>
-{/if}
-
-{#if showNotification}
-	<div class="toast" transition:fade>
-		<ToastNotification
-			timeout={3000}
-			kind="success"
-			title="Image removed."
-			subtitle={`Removed image: ${showNotification}`}
-			on:close={() => (showNotification = false)}
-		/>
-	</div>
 {/if}
 
 <style>

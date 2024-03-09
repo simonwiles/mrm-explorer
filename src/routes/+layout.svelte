@@ -1,5 +1,6 @@
 <script>
 	import { Header, SkipToContent, Content } from 'carbon-components-svelte';
+	import Notifications from '@/components/Notifications.svelte';
 	import 'carbon-components-svelte/css/g90.css';
 
 	import logo from '../img/sul.41x40.png';
@@ -15,6 +16,8 @@
 <Content>
 	<slot />
 </Content>
+
+<Notifications />
 
 <style>
 	img {
@@ -32,5 +35,11 @@
 
 	:global(.tippy-box) {
 		box-shadow: 0 0 4px 0px white;
+	}
+
+	:global(.toast) {
+		position: absolute;
+		top: 4rem;
+		right: 2rem;
 	}
 </style>
