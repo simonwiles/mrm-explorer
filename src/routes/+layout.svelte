@@ -1,17 +1,57 @@
 <script>
-	import { Header, SkipToContent, Content } from 'carbon-components-svelte';
-	import Notifications from '@/components/Notifications.svelte';
+	import { page } from '$app/stores';
+	import {
+		Content,
+		Header,
+		SideNav,
+		SideNavDivider,
+		SideNavItems,
+		SideNavLink,
+		SkipToContent
+	} from 'carbon-components-svelte';
+	import DataBase from 'carbon-icons-svelte/lib/DataBase.svelte';
+	import Home from 'carbon-icons-svelte/lib/Home.svelte';
+	import LogoGithub from 'carbon-icons-svelte/lib/LogoGithub.svelte';
+	import SearchLocate from 'carbon-icons-svelte/lib/SearchLocate.svelte';
+
+	import Notifications from '@components/Notifications.svelte';
 	import '@/carbon-theming.css';
 
 	import logo from '../img/sul.41x40.png';
+
+	let isSideNavOpen = false;
 </script>
 
-<Header platformName="MRM Explorer">
+<Header platformName="MRM Explorer" bind:isSideNavOpen>
 	<img slot="company" src={logo} alt="Stanford University Libraries" />
 	<svelte:fragment slot="skip-to-content">
 		<SkipToContent />
 	</svelte:fragment>
 </Header>
+
+<SideNav bind:isOpen={isSideNavOpen} rail>
+	<SideNavItems>
+		<SideNavLink icon={Home} text="Home" href="/" isSelected={$page.url.pathname == '/'} />
+		<SideNavLink
+			icon={DataBase}
+			text="Dataset"
+			href="/dataset/"
+			isSelected={$page.url.pathname == '/dataset'}
+		/>
+		<SideNavLink
+			icon={SearchLocate}
+			text="Search Interface"
+			href="/search/"
+			isSelected={$page.url.pathname == '/search'}
+		/>
+		<SideNavDivider />
+		<SideNavLink
+			icon={LogoGithub}
+			text="GitHub"
+			href="https://github.com/simonwiles/mrm-explorer"
+		/>
+	</SideNavItems>
+</SideNav>
 
 <Content>
 	<slot />

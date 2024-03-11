@@ -2,6 +2,7 @@
 
 @import 'carbon-components-svelte/css/g90.css' layer(base);
 
+/* Theme Colors */
 :root {
 	--g90-body-background: #262626;
 	--g90-panel-background: #161616;
@@ -12,6 +13,7 @@
 	--primary-active: #436140;
 }
 
+/* Button and Link Colors */
 .bx--file-browse-btn {
 	color: var(--primary-hover);
 }
@@ -25,4 +27,44 @@
 	&.active {
 		background-color: var(--primary-active);
 	}
+}
+
+/* Side Nav Colors */
+.bx--side-nav__navigation {
+	background-color: var(--g90-panel-background);
+}
+
+.bx--side-nav__link {
+	color: var(--g90-text);
+
+	.bx--side-nav__link-text {
+		color: white;
+	}
+
+	.bx--side-nav__icon svg {
+		fill: currentColor;
+	}
+
+	&:hover,
+	&[aria-current='page'] {
+		background-color: var(--g90-body-background);
+	}
+
+	&.bx--side-nav__link--current::before {
+		background-color: var(--primary);
+	}
+}
+
+/* Side Nav Rail -- Increase Size */
+.bx--side-nav__link {
+	min-height: 3.5rem;
+
+	.bx--side-nav__icon svg {
+		width: 1.5rem;
+		height: 1.5rem;
+	}
+}
+
+.bx--side-nav--rail {
+	min-width: 3.5rem;
 }
