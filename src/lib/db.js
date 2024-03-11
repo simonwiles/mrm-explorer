@@ -6,11 +6,13 @@ import Dexie from 'dexie';
  * @property {string} name name of the image
  * @property {string | ArrayBuffer | null} imageData base64 encoded image
  * @property {Object<string,*>} [features]
+ * @property {number} [width]
+ * @property {number} [height]
  */
 
 export const db = new Dexie('mrmExplorer');
 db.version(1).stores({
-	images: '++id, name, imageData, features'
+	images: '++id, name, imageData, features, width, height'
 });
 
 export const fetchAllImageObjects = async () => {

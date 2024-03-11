@@ -129,6 +129,19 @@
 			}
 		});
 	});
+
+	$effect(() => {
+		if (imageObject && !(imageObject.width && imageObject.height)) {
+			const img = new Image();
+			img.src = imageObject.imageData;
+			img.decode().then(() => {
+				imageObject.width = img.naturalWidth;
+				imageObject.height = img.naturalHeight;
+			});
+		}
+	});
+
+	$inspect(imageObject);
 </script>
 
 {#if imageObject === undefined}
