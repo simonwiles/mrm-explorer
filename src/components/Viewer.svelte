@@ -113,7 +113,11 @@
 
 	$effect(() => {
 		// TODO ? There's an unnecessary (but harmless?) update here when imageObject is first initialised
-		imageObject && upsertImageObject(unstate(imageObject));
+		if (imageObject) {
+			upsertImageObject(unstate(imageObject)).then(([updated, newImageObject]) => {
+				if (updated) imageObject = newImageObject;
+			});
+		}
 	});
 
 	$effect(() => {

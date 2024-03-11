@@ -26,13 +26,14 @@ export const upsertImageObject = async (imageObject) => {
 		if (imageObject.id) {
 			await db.table('images').update(imageObject.id, imageObject);
 			console.log(`Image ${imageObject.name} successfully updated.`);
-			return imageObject;
+			return [false, imageObject];
 		}
 		const id = await db.table('images').add(imageObject);
 		console.log(`Image ${imageObject.name} successfully added. Got id ${imageObject.id}`);
-		return { id, ...imageObject };
+		return [true, { id, ...imageObject }];
 	} catch (error) {
 		console.error(`Failed to upsert ${imageObject.name}: ${error}`);
+		return [false, {}];
 	}
 };
 
