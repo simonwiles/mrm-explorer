@@ -1,14 +1,20 @@
 <script>
-	import { Loading } from 'carbon-components-svelte';
-	import { FileUploaderDropContainer } from 'carbon-components-svelte';
-	import { Grid, Row, Column, Toolbar, ToolbarContent, Button } from 'carbon-components-svelte';
+	import {
+		Button,
+		Column,
+		FileUploaderDropContainer,
+		Grid,
+		Loading,
+		Row,
+		Toolbar,
+		ToolbarContent
+	} from 'carbon-components-svelte';
 	import { CloseLarge } from 'carbon-icons-svelte';
 	import { db } from '$lib/db';
 	import { tooltip } from '$lib/tooltip-action';
 	import { notify } from '@components/Notifications.svelte';
 
 	let image = $state();
-
 	let svg = $state();
 
 	/**
@@ -227,12 +233,6 @@
 		text-align: center;
 		vertical-align: middle;
 		width: 100%;
-	}
-
-	.toast {
-		position: absolute;
-		right: 1rem;
-		top: calc(48px + 1rem);
 	}
 
 	.image-name {
