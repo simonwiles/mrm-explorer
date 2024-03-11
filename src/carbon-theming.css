@@ -29,6 +29,11 @@
 	}
 }
 
+/* Loading Component */
+.bx--loading__stroke {
+	stroke: var(--primary);
+}
+
 /* Side Nav Colors */
 .bx--side-nav__navigation {
 	background-color: var(--g90-panel-background);
