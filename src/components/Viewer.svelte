@@ -1,4 +1,5 @@
 <script>
+	import { unstate } from 'svelte';
 	import {
 		Button,
 		Column,
@@ -10,45 +11,17 @@
 		ToolbarContent
 	} from 'carbon-components-svelte';
 	import { CloseLarge } from 'carbon-icons-svelte';
-	import { db } from '$lib/db';
+	import { fetchAllImageObjects, removeImageObject, upsertImageObject } from '$lib/db';
 	import { tooltip } from '$lib/tooltip-action';
 	import { notify } from '@components/Notifications.svelte';
 
-	let image = $state();
+	let imageObject = $state();
 	let svg = $state();
 
-	/**
-	 * Add an image to the database
-	 * @param {string} imgName
-	 * @param {string | ArrayBuffer | null} imgData
-	 */
-	async function addImage(imgName, imgData) {
-		try {
-			const id = await db.images.add({ name: imgName, image: imgData });
-			console.log(`Image ${imgName} successfully added. Got id ${id}`);
-			image = { id: id, name: imgName, image: imgData };
-		} catch (error) {
-			console.error(`Failed to add ${imgName}: ${error}`);
-		}
-	}
-
 	async function removeImage() {
-		await db.images.delete(image.id);
-		notify({ title: 'Image removed', subtitle: `Image "${image.name}" removed` });
-		image = false;
-	}
-
-	/**
-	 * Add an image to the database
-	 * @param {string} imgJson
-	 */
-	async function addJson(imgJson) {
-		try {
-			await db.images.update(image.id, { mrm_json: imgJson });
-			image.mrm_json = imgJson;
-		} catch (error) {
-			console.error(`Failed to add json: ${error}`);
-		}
+		await removeImageObject(imageObject);
+		notify({ title: 'Image removed', subtitle: `Image "${imageObject.name}" removed` });
+		imageObject = false;
 	}
 
 	/**
@@ -122,40 +95,43 @@
 	};
 
 	$effect(() => {
-		if (image && image.mrm_json && svg) {
-			image.mrm_json.features.forEach((/** @type {Object} */ feature, /** @type {number} */ i) => {
-				const featurePath = createFeaturePath(feature, i);
-				svg.appendChild(featurePath);
+		if (imageObject && imageObject.features && svg) {
+			imageObject.features.features.forEach(
+				(/** @type {Object} */ feature, /** @type {number} */ i) => {
+					const featurePath = createFeaturePath(feature, i);
+					svg.appendChild(featurePath);
 
-				tooltip(featurePath, {
-					placement: 'top',
-					arrow: true,
-					allowHTML: true
-				});
-			});
+					tooltip(featurePath, {
+						placement: 'top',
+						arrow: true,
+						allowHTML: true
+					});
+				}
+			);
 		}
 	});
 
 	$effect(() => {
-		// $effect doesn't work properly with async functions
-		// https://github.com/sveltejs/svelte/issues/9520#issuecomment-1817092724
-		async function loadImage() {
-			const images = await db.images.toArray();
+		// TODO ? There's an unnecessary (but harmless?) update here when imageObject is first initialised
+		imageObject && upsertImageObject(unstate(imageObject));
+	});
+
+	$effect(() => {
+		fetchAllImageObjects().then((images) => {
 			if (images.length > 0) {
-				image = images[0];
+				imageObject = images[0];
 			} else {
-				image = false;
+				imageObject = false;
 			}
-		}
-		loadImage();
+		});
 	});
 </script>
 
-{#if image === undefined}
+{#if imageObject === undefined}
 	<Loading />
 {/if}
 
-{#if image === false}
+{#if imageObject === false}
 	<FileUploaderDropContainer
 		on:change={({ detail: files }) => {
 			const file = files[0];
@@ -164,7 +140,11 @@
 				return;
 			}
 			const reader = new FileReader();
-			reader.addEventListener('load', () => addImage(file.name, reader.result), false);
+			reader.addEventListener(
+				'load',
+				() => (imageObject = { name: file.name, imageData: reader.result }),
+				false
+			);
 			reader.readAsDataURL(file);
 		}}
 	>
@@ -174,14 +154,14 @@
 	</FileUploaderDropContainer>
 {/if}
 
-{#if image}
+{#if imageObject}
 	<Grid fullWidth>
 		<Row>
 			<Column>
 				<Toolbar size="sm">
 					<ToolbarContent>
-						<div class="image-name">{image.name}</div>
-						{#if !image.mrm_json}
+						<div class="image-name">{imageObject.name}</div>
+						{#if !imageObject.features}
 							<FileUploaderDropContainer
 								labelText="Add JSON"
 								class="add-json"
@@ -195,7 +175,11 @@
 										return;
 									}
 									const reader = new FileReader();
-									reader.addEventListener('load', () => addJson(JSON.parse(reader.result)), false);
+									reader.addEventListener(
+										'load',
+										() => (imageObject.features = JSON.parse(reader.result)),
+										false
+									);
 									reader.readAsText(file);
 								}}
 							></FileUploaderDropContainer>
@@ -214,8 +198,8 @@
 		<Row>
 			<Column>
 				<div class="image-container" use:wheelZoom>
-					<img src={image.image} alt={image.name} />
-					{#if image.mrm_json}
+					<img src={imageObject.imageData} alt={imageObject.name} />
+					{#if imageObject.features}
 						<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 750" bind:this={svg}></svg>
 					{/if}
 				</div>
