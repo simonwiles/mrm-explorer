@@ -4,11 +4,6 @@ settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
-patchedDependencies:
-  carbon-components-svelte@1.0.0-next.1:
-    hash: kzn3yvwwv75kld6me26azgs7qe
-    path: patches/carbon-components-svelte@1.0.0-next.1.patch
-
 devDependencies:
   '@sveltejs/adapter-static':
     specifier: ^3.0.1
@@ -23,8 +18,8 @@ devDependencies:
     specifier: ^8.56.5
     version: 8.56.5
   carbon-components-svelte:
-    specifier: 1.0.0-next.1
-    version: 1.0.0-next.1(patch_hash=kzn3yvwwv75kld6me26azgs7qe)
+    specifier: 0.84.0
+    version: 0.84.0
   carbon-icons-svelte:
     specifier: ^12.5.0
     version: 12.5.0
@@ -339,6 +334,12 @@ packages:
 
   /@humanwhocodes/object-schema@2.0.2:
     resolution: {integrity: sha512-6EwiSjwWYP7pTckG6I5eyFANjPhmPjUX9JRLUSfNPC7FX7zK9gyZAfUEaECL6ALTpGX5AjnBq3C9XmVWPitNpw==}
+    dev: true
+
+  /@ibm/telemetry-js@1.2.1:
+    resolution: {integrity: sha512-ZNuqoclscha2RC089RBPkiGzv8g+mQfBOnHDJZEGBFrvsXg0B9lfRGFBSLzCuTR5nFDqVFYb6XqMRu36EiHIDA==}
+    engines: {node: '>=16', npm: '>=8'}
+    hasBin: true
     dev: true
 
   /@jridgewell/gen-mapping@0.3.5:
@@ -701,12 +702,13 @@ packages:
     engines: {node: '>=6'}
     dev: true
 
-  /carbon-components-svelte@1.0.0-next.1(patch_hash=kzn3yvwwv75kld6me26azgs7qe):
-    resolution: {integrity: sha512-Q9CCYKI448SJSaQIKjqDx9DkCBZoYKEoGRb4tCr2YOXZqt1+4P71mLjtp72qy1rCObWt8AYo3ceAF3hEDi78kA==}
+  /carbon-components-svelte@0.84.0:
+    resolution: {integrity: sha512-NSIGFYsmUJ04aOuQaS8e5ldnufj8gJpYnaPnMM3O+jQJdd6bEpGKhuh7fpdB0U67QEQYbSrxmuRzThLh85Qpnw==}
+    requiresBuild: true
     dependencies:
+      '@ibm/telemetry-js': 1.2.1
       flatpickr: 4.6.9
     dev: true
-    patched: true
 
   /carbon-icons-svelte@12.5.0:
     resolution: {integrity: sha512-f7iTJ5euF9e6rniXasUaLbueNg/19poywJiiBVSsXg8dMv3D71jOun69mKxGeVvL8Rh4Xw5I6jieHxrXz43s3g==}
