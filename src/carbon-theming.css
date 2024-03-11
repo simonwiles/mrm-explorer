@@ -1,0 +1,28 @@
+@layer base, custom;
+
+@import 'carbon-components-svelte/css/g90.css' layer(base);
+
+:root {
+	--g90-body-background: #262626;
+	--g90-panel-background: #161616;
+	--g90-text: #f4f4f4;
+
+	--primary: #578552;
+	--primary-hover: #76c46d;
+	--primary-active: #436140;
+}
+
+.bx--file-browse-btn {
+	color: var(--primary-hover);
+}
+
+.bx--btn--primary {
+	background-color: var(--primary);
+
+	&:hover {
+		background-color: var(--primary-hover);
+	}
+	&.active {
+		background-color: var(--primary-active);
+	}
+}

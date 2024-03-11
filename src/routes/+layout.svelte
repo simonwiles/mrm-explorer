@@ -1,7 +1,7 @@
 <script>
 	import { Header, SkipToContent, Content } from 'carbon-components-svelte';
 	import Notifications from '@/components/Notifications.svelte';
-	import 'carbon-components-svelte/css/g90.css';
+	import '@/carbon-theming.css';
 
 	import logo from '../img/sul.41x40.png';
 </script>
@@ -24,13 +24,6 @@
 		height: 30px;
 		margin: 0 1rem 0 0;
 		vertical-align: text-bottom;
-	}
-
-	:global(:root) {
-		--bx-button-primary: #578552;
-		--bx-button-primary-hover: #76c46d;
-		--bx-button-primary-active: #436140;
-		--bx-link-primary: #76c46d;
 	}
 
 	:global(.tippy-box) {

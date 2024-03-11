@@ -247,11 +247,16 @@
 	}
 
 	:global(.add-json .bx--file-browse-btn) {
-		max-height: 100%;
+		height: 100%;
+		margin: 0;
 	}
 
 	:global(.add-json .bx--file__drop-container) {
 		border: 0;
+		display: grid;
+		height: 100%;
+		padding: 0 1rem;
+		place-content: center;
 	}
 
 	.image-container {
