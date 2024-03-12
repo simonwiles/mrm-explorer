@@ -1,14 +1,5 @@
+import '$lib/types.js';
 import Dexie from 'dexie';
-
-/**
- * @typedef {Object} ImageObject
- * @property {number} [id] internal database id
- * @property {string} name name of the image
- * @property {string | ArrayBuffer | null} imageData base64 encoded image
- * @property {Object<string,*>} [features]
- * @property {number} [width]
- * @property {number} [height]
- */
 
 export const db = new Dexie('mrmExplorer');
 db.version(1).stores({

@@ -1,4 +1,5 @@
 <script>
+	import '$lib/types.js';
 	import { tick, unstate } from 'svelte';
 	import {
 		Button,
@@ -18,7 +19,12 @@
 	let imageObject = $state();
 	let svg = $state();
 
+	/**
+	 * @param {string} name name of the image
+	 * @param {string} imageData base64 encoded image
+	 */
 	async function addImage(name, imageData) {
+		/** @type {ImageObject} */
 		const _imageObject = { name, imageData };
 		const img = new Image();
 		img.src = imageData;
@@ -31,10 +37,13 @@
 		});
 	}
 
-	async function addFeaturesToImage(features) {
-		imageObject.features = features;
+	/**
+	 * @param {{features: Array<Feature>}} mrmGeoJson
+	 */
+	async function addFeaturesToImage(mrmGeoJson) {
+		imageObject.features = mrmGeoJson.features;
 		await tick();
-		createFeaturePaths(features.features);
+		createFeaturePaths(mrmGeoJson.features);
 		upsertImageObject(unstate(imageObject));
 	}
 
@@ -92,8 +101,11 @@
 	 */
 	const scale_coords = (vertices, scale) => vertices.map(([x, y]) => [x / scale, 1 - y / scale]);
 
+	/**
+	 * @param {Array<Feature>} features
+	 */
 	const createFeaturePaths = (features) => {
-		features.forEach((/** @type {Object} */ feature, /** @type {number} */ i) => {
+		features.forEach((feature, i) => {
 			const featurePath = createFeaturePath(feature, i);
 			svg.appendChild(featurePath);
 
@@ -106,7 +118,7 @@
 	};
 
 	/**
-	 * @param {any} feature
+	 * @param {Feature} feature
 	 * @param {number} i
 	 */
 	const createFeaturePath = (feature, i) => {
@@ -119,7 +131,7 @@
 		featurePath.setAttribute('d', path.join(' '));
 		featurePath.setAttribute('data-idx', `${i}`);
 		featurePath.setAttribute('data-text', feature.properties.text);
-		featurePath.setAttribute('data-score', feature.properties.score);
+		featurePath.setAttribute('data-score', feature.properties.score.toFixed(4));
 		featurePath.setAttribute(
 			'data-tippy-content',
 			`text: ${feature.properties.text}<br>score: ${feature.properties.score}`
@@ -154,7 +166,11 @@
 				return;
 			}
 			const reader = new FileReader();
-			reader.addEventListener('load', () => addImage(file.name, reader.result), false);
+			reader.addEventListener(
+				'load',
+				() => typeof reader.result === 'string' && addImage(file.name, reader.result),
+				false
+			);
 			reader.readAsDataURL(file);
 		}}
 	>
@@ -187,7 +203,9 @@
 									const reader = new FileReader();
 									reader.addEventListener(
 										'load',
-										() => addFeaturesToImage(JSON.parse(reader.result)),
+										() =>
+											typeof reader.result === 'string' &&
+											addFeaturesToImage(JSON.parse(reader.result)),
 										false
 									);
 									reader.readAsText(file);
