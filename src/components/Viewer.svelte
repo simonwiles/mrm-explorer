@@ -5,11 +5,8 @@
 
 	import {
 		Button,
-		Column,
 		FileUploaderDropContainer,
-		Grid,
 		Loading,
-		Row,
 		Toolbar,
 		ToolbarContent
 	} from 'carbon-components-svelte';
@@ -147,62 +144,64 @@
 {/if}
 
 {#if imageObject}
-	<Grid fullWidth>
-		<Row>
-			<Column>
-				<Toolbar size="sm">
-					<ToolbarContent>
-						<div class="image-name">{imageObject.name}</div>
-						{#if !imageObject.features}
-							<FileUploaderDropContainer
-								labelText="Add JSON"
-								class="add-json"
-								on:change={({ detail: files }) => {
-									const file = files[0];
-									if (
-										!file.type ||
-										!['application/geo+json', 'application/json'].includes(file.type)
-									) {
-										alert('Only JSON / GEOJSON files are accepted');
-										return;
-									}
-									const reader = new FileReader();
-									reader.addEventListener(
-										'load',
-										() =>
-											typeof reader.result === 'string' &&
-											addFeaturesToImage(JSON.parse(reader.result)),
-										false
-									);
-									reader.readAsText(file);
-								}}
-							></FileUploaderDropContainer>
-						{/if}
-						<Button
-							icon={CloseLarge}
-							iconDescription="Close"
-							on:click={removeImage}
-							tooltipPosition="left"
-							tooltipAlignment="end"
-						/>
-					</ToolbarContent>
-				</Toolbar>
-			</Column>
-		</Row>
-		<Row>
-			<Column>
-				<div class="image-container" use:wheelZoom>
-					<img src={imageObject.imageData} alt={imageObject.name} />
-					{#if imageObject.features}
-						<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 750" bind:this={svg}></svg>
-					{/if}
-				</div>
-			</Column>
-		</Row>
-	</Grid>
+	<div class="viewer">
+		<Toolbar size="sm">
+			<ToolbarContent>
+				<div class="image-name">{imageObject.name}</div>
+				{#if !imageObject.features}
+					<FileUploaderDropContainer
+						labelText="Add JSON"
+						class="add-json"
+						on:change={({ detail: files }) => {
+							const file = files[0];
+							if (!file.type || !['application/geo+json', 'application/json'].includes(file.type)) {
+								alert('Only JSON / GEOJSON files are accepted');
+								return;
+							}
+							const reader = new FileReader();
+							reader.addEventListener(
+								'load',
+								() =>
+									typeof reader.result === 'string' &&
+									addFeaturesToImage(JSON.parse(reader.result)),
+								false
+							);
+							reader.readAsText(file);
+						}}
+					></FileUploaderDropContainer>
+				{/if}
+				<Button
+					icon={CloseLarge}
+					iconDescription="Close"
+					on:click={removeImage}
+					tooltipPosition="left"
+					tooltipAlignment="end"
+				/>
+			</ToolbarContent>
+		</Toolbar>
+
+		<div class="image-container" use:wheelZoom>
+			<img src={imageObject.imageData} alt={imageObject.name} />
+			{#if imageObject.features}
+				<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 750" bind:this={svg}></svg>
+			{/if}
+		</div>
+	</div>
 {/if}
 
 <style>
+	:global(#main-content) {
+		height: calc(100vh - 3rem);
+		overflow: hidden;
+	}
+
+	.viewer {
+		max-height: 100%;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+	}
+
 	.file-upload-dropzone {
 		align-items: center;
 		display: flex;
@@ -243,12 +242,16 @@
 		grid-template-rows: auto;
 		overflow: hidden;
 		position: relative;
+		max-width: 100%;
+		max-height: 100%;
+		aspect-ratio: 1200 / 900;
 
 		img {
 			transform: scale(var(--scale));
 			transform-origin: var(--transform-origin-X) var(--transform-origin-Y);
 			transition: transform 0.1s linear;
-			width: 100%;
+			max-height: 100%;
+			max-width: 100%;
 		}
 
 		svg {
