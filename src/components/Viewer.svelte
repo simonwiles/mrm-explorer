@@ -1,5 +1,5 @@
 <script>
-	import { unstate } from 'svelte';
+	import { tick, unstate } from 'svelte';
 	import {
 		Button,
 		Column,
@@ -17,6 +17,26 @@
 
 	let imageObject = $state();
 	let svg = $state();
+
+	async function addImage(name, imageData) {
+		const _imageObject = { name, imageData };
+		const img = new Image();
+		img.src = imageData;
+		img.decode().then(() => {
+			_imageObject.width = img.naturalWidth;
+			_imageObject.height = img.naturalHeight;
+			upsertImageObject(_imageObject).then(([_, newImageObject]) => {
+				imageObject = newImageObject;
+			});
+		});
+	}
+
+	async function addFeaturesToImage(features) {
+		imageObject.features = features;
+		await tick();
+		createFeaturePaths(features.features);
+		upsertImageObject(unstate(imageObject));
+	}
 
 	async function removeImage() {
 		await removeImageObject(imageObject);
@@ -72,6 +92,19 @@
 	 */
 	const scale_coords = (vertices, scale) => vertices.map(([x, y]) => [x / scale, 1 - y / scale]);
 
+	const createFeaturePaths = (features) => {
+		features.forEach((/** @type {Object} */ feature, /** @type {number} */ i) => {
+			const featurePath = createFeaturePath(feature, i);
+			svg.appendChild(featurePath);
+
+			tooltip(featurePath, {
+				placement: 'top',
+				arrow: true,
+				allowHTML: true
+			});
+		});
+	};
+
 	/**
 	 * @param {any} feature
 	 * @param {number} i
@@ -95,53 +128,17 @@
 	};
 
 	$effect(() => {
-		if (imageObject && imageObject.features && svg) {
-			imageObject.features.features.forEach(
-				(/** @type {Object} */ feature, /** @type {number} */ i) => {
-					const featurePath = createFeaturePath(feature, i);
-					svg.appendChild(featurePath);
-
-					tooltip(featurePath, {
-						placement: 'top',
-						arrow: true,
-						allowHTML: true
-					});
-				}
-			);
-		}
-	});
-
-	$effect(() => {
-		// TODO ? There's an unnecessary (but harmless?) update here when imageObject is first initialised
-		if (imageObject) {
-			upsertImageObject(unstate(imageObject)).then(([updated, newImageObject]) => {
-				if (updated) imageObject = newImageObject;
-			});
-		}
-	});
-
-	$effect(() => {
 		fetchAllImageObjects().then((images) => {
 			if (images.length > 0) {
 				imageObject = images[0];
+				if (imageObject.features) {
+					tick().then(() => createFeaturePaths(imageObject.features));
+				}
 			} else {
 				imageObject = false;
 			}
 		});
 	});
-
-	$effect(() => {
-		if (imageObject && !(imageObject.width && imageObject.height)) {
-			const img = new Image();
-			img.src = imageObject.imageData;
-			img.decode().then(() => {
-				imageObject.width = img.naturalWidth;
-				imageObject.height = img.naturalHeight;
-			});
-		}
-	});
-
-	$inspect(imageObject);
 </script>
 
 {#if imageObject === undefined}
@@ -157,11 +154,7 @@
 				return;
 			}
 			const reader = new FileReader();
-			reader.addEventListener(
-				'load',
-				() => (imageObject = { name: file.name, imageData: reader.result }),
-				false
-			);
+			reader.addEventListener('load', () => addImage(file.name, reader.result), false);
 			reader.readAsDataURL(file);
 		}}
 	>
@@ -194,7 +187,7 @@
 									const reader = new FileReader();
 									reader.addEventListener(
 										'load',
-										() => (imageObject.features = JSON.parse(reader.result)),
+										() => addFeaturesToImage(JSON.parse(reader.result)),
 										false
 									);
 									reader.readAsText(file);
