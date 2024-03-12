@@ -1,6 +1,8 @@
 <script>
 	import '$lib/types.js';
+
 	import { tick, unstate } from 'svelte';
+
 	import {
 		Button,
 		Column,
@@ -12,8 +14,11 @@
 		ToolbarContent
 	} from 'carbon-components-svelte';
 	import { CloseLarge } from 'carbon-icons-svelte';
+
 	import { fetchAllImageObjects, removeImageObject, upsertImageObject } from '$lib/db';
-	import { tooltip } from '$lib/tooltip-action';
+	import { tooltip } from '$lib/actions/tooltip';
+	import { wheelZoom } from '$lib/actions/wheel-zoom';
+
 	import { notify } from '@components/Notifications.svelte';
 
 	let imageObject = $state();
@@ -51,45 +56,6 @@
 		await removeImageObject(imageObject);
 		notify({ title: 'Image removed', subtitle: `Image "${imageObject.name}" removed` });
 		imageObject = false;
-	}
-
-	/**
-	 * Applies a non-passive wheel event listener to the given element
-	 * (event modifiers are deprecated in Svelte 5, and we can't express
-	 *  "nonpassive" as a wrapper function.
-	 *  see: https://svelte-5-preview.vercel.app/docs/event-handlers#event-modifiers)
-	 * @param {HTMLElement} node
-	 */
-	function wheelZoom(node) {
-		/** @type {EventListenerOptions & { passive: Boolean }} */
-		const options = { passive: false };
-
-		let scale = 1;
-		let transformOrigin = [0, 0];
-
-		/**
-		 * @param {WheelEvent} event
-		 */
-		function handler(event) {
-			event.preventDefault();
-			if (event.deltaY < 0) {
-				transformOrigin = [event.clientX - node.offsetLeft, event.clientY - node.offsetTop];
-				scale *= 1.1;
-			} else {
-				scale /= 1.1;
-				if (scale < 1) scale = 1;
-			}
-			node.style.setProperty('--scale', `${scale.toFixed(4)}`);
-			node.style.setProperty('--transform-origin-X', `${transformOrigin[0]}px`);
-			node.style.setProperty('--transform-origin-Y', `${transformOrigin[1]}px`);
-		}
-
-		node.addEventListener('wheel', handler, options);
-		return {
-			destroy() {
-				node.removeEventListener('wheel', handler, options);
-			}
-		};
 	}
 
 	const scale = 4416 / 1000;
