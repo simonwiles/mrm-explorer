@@ -248,6 +248,7 @@
 	}
 
 	.image-container {
+		--scale: 1;
 		aspect-ratio: var(--aspect-ratio);
 		display: grid;
 		grid-template-columns: auto;
@@ -277,6 +278,7 @@
 		svg :global(path) {
 			fill: transparent;
 			stroke: #44f8;
+			stroke-width: calc(6px / var(--scale));
 		}
 
 		svg :global(path.marked) {
