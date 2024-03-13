@@ -28,7 +28,7 @@
 {:else if rows.length === 0}
 	<p>wot no images?</p>
 {:else}
-	<DataTable {headers} {rows}>
+	<DataTable {headers} {rows} class="dataset-table">
 		<svelte:fragment slot="cell" let:row let:cell>
 			{#if cell.key === 'imageData'}
 				<img src={cell.value} alt={cell.value} height="80px" />
@@ -49,15 +49,20 @@
 {/if}
 
 <style>
+	:global(.dataset-table) {
+		max-width: 1200px;
+	}
+
 	img {
 		margin: 0.5rem 0;
 		transform-origin: 10% 10%;
-		transition: all 500ms ease;
+		transition: all 200ms ease-out;
 
 		&:hover {
 			border-radius: 4px;
 			box-shadow: 0 0 4px 2px #fff5;
 			scale: 4;
+			transition: all 400ms ease;
 		}
 	}
 </style>
