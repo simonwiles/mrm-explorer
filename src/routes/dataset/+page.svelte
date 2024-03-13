@@ -1,5 +1,5 @@
 <script>
-	import { DataTable, Loading } from 'carbon-components-svelte';
+	import { DataTable, Loading, OverflowMenu, OverflowMenuItem } from 'carbon-components-svelte';
 	import { fetchAllImageObjects } from '$lib/db';
 
 	let rows = $state();
@@ -9,7 +9,8 @@
 		{ key: 'name', value: 'Name' },
 		{ key: 'features', value: '# Features' },
 		{ key: 'size', value: 'Size' },
-		{ key: 'imageData', value: 'Image' }
+		{ key: 'imageData', value: 'Image' },
+		{ key: 'actions', empty: true, width: '8rem' }
 	];
 
 	$effect(() => {
@@ -35,6 +36,11 @@
 				{cell.value.length}
 			{:else if cell.key === 'size'}
 				{row.width}x{row.height}
+			{:else if cell.key === 'actions'}
+				<OverflowMenu flipped>
+					<OverflowMenuItem text="View" />
+					<OverflowMenuItem danger text="Delete" />
+				</OverflowMenu>
 			{:else}
 				{cell.value}
 			{/if}
