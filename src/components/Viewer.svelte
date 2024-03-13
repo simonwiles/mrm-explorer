@@ -57,15 +57,6 @@
 		imageObject = false;
 	}
 
-	const scale = 4416 / 1000;
-
-	/**
-	 * @param {number[][]} vertices
-	 * @param {number} scale
-	 * @returns {number[][]}
-	 */
-	const scale_coords = (vertices, scale) => vertices.map(([x, y]) => [x / scale, 1 - y / scale]);
-
 	/**
 	 * @param {Array<Feature>} features
 	 */
@@ -88,7 +79,7 @@
 	 */
 	const createFeaturePath = (feature, i) => {
 		const featurePath = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-		const vertices = scale_coords(feature.geometry.coordinates[0], scale);
+		const vertices = feature.geometry.coordinates[0].map(([x, y]) => [x, 1 - y]);
 		const path = [];
 		path.push(`M ${vertices[0][0]} ${vertices[0][1]}`);
 		vertices.slice(1).forEach(([x, y]) => path.push(`L ${x} ${y}`));
@@ -192,10 +183,18 @@
 			</ToolbarContent>
 		</Toolbar>
 
-		<div class="image-container" use:wheelZoom>
+		<div
+			class="image-container"
+			use:wheelZoom
+			style="--aspect-ratio: {imageObject.width} / {imageObject.height}"
+		>
 			<img src={imageObject.imageData} alt={imageObject.name} bind:this={imageEl} />
 			{#if imageObject.features}
-				<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 750" bind:this={svg}></svg>
+				<svg
+					xmlns="http://www.w3.org/2000/svg"
+					viewBox={`0 0 ${imageObject.width} ${imageObject.height}`}
+					bind:this={svg}
+				></svg>
 			{/if}
 		</div>
 	</div>
@@ -249,7 +248,7 @@
 	}
 
 	.image-container {
-		aspect-ratio: 1200 / 900;
+		aspect-ratio: var(--aspect-ratio);
 		display: grid;
 		grid-template-columns: auto;
 		grid-template-rows: auto;
