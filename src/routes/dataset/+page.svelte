@@ -5,10 +5,10 @@
 	let rows = $state();
 
 	const headers = [
-		{ key: 'id', value: 'ID' },
+		{ key: 'id', value: 'ID', width: '8rem' },
 		{ key: 'name', value: 'Name' },
-		{ key: 'features', value: 'Features' },
-		{ key: 'width', value: 'Size' },
+		{ key: 'features', value: '# Features' },
+		{ key: 'size', value: 'Size' },
 		{ key: 'imageData', value: 'Image' }
 	];
 
@@ -33,11 +33,25 @@
 				<img src={cell.value} alt={cell.value} height="80px" />
 			{:else if cell.key === 'features'}
 				{cell.value.length}
-			{:else if cell.key === 'width'}
-				{cell.value}x{row.height}
+			{:else if cell.key === 'size'}
+				{row.width}x{row.height}
 			{:else}
 				{cell.value}
 			{/if}
 		</svelte:fragment>
 	</DataTable>
 {/if}
+
+<style>
+	img {
+		margin: 0.5rem 0;
+		transform-origin: 10% 10%;
+		transition: all 500ms ease;
+
+		&:hover {
+			border-radius: 4px;
+			box-shadow: 0 0 4px 2px #fff5;
+			scale: 4;
+		}
+	}
+</style>
