@@ -19,6 +19,8 @@
 	import { notify } from '@components/Notifications.svelte';
 
 	let imageObject = $state();
+	let imageEl = $state();
+	let toolbarWidth = $state();
 	let svg = $state();
 
 	/**
@@ -114,6 +116,16 @@
 			}
 		});
 	});
+
+	$effect(() => {
+		// This is a horrible hack to force the toolbar to be the same width as the image
+		//  on Firefox specifically -- it is not required on Chromium-based browsers.
+		// In addition to `grid-template-columns: max-content;` seemingly not working on
+		//  Firefox, FF also reports `imageEl.width` as 0 unless the `setTimeout` is used.
+		// This hack is also not responsive to viewport changes.  It will have to go
+		//  sooner rather than later.
+		imageEl && setTimeout(() => (toolbarWidth = imageEl.width + 'px'), 0);
+	});
 </script>
 
 {#if imageObject === undefined}
@@ -145,7 +157,7 @@
 
 {#if imageObject}
 	<div class="viewer">
-		<Toolbar size="sm">
+		<Toolbar size="sm" style={toolbarWidth ? `max-width: ${toolbarWidth}` : ''}>
 			<ToolbarContent>
 				<div class="image-name">{imageObject.name}</div>
 				{#if !imageObject.features}
@@ -181,7 +193,7 @@
 		</Toolbar>
 
 		<div class="image-container" use:wheelZoom>
-			<img src={imageObject.imageData} alt={imageObject.name} />
+			<img src={imageObject.imageData} alt={imageObject.name} bind:this={imageEl} />
 			{#if imageObject.features}
 				<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 750" bind:this={svg}></svg>
 			{/if}
@@ -196,10 +208,10 @@
 	}
 
 	.viewer {
-		max-height: 100%;
-		display: flex;
-		flex-direction: column;
-		align-items: center;
+		display: grid;
+		grid-template-columns: max-content;
+		grid-template-rows: max-content;
+		height: 100%;
 	}
 
 	.file-upload-dropzone {
@@ -237,14 +249,15 @@
 	}
 
 	.image-container {
+		aspect-ratio: 1200 / 900;
 		display: grid;
 		grid-template-columns: auto;
 		grid-template-rows: auto;
+		height: 100%;
+		max-height: 100%;
+		max-width: 100%;
 		overflow: hidden;
 		position: relative;
-		max-width: 100%;
-		max-height: 100%;
-		aspect-ratio: 1200 / 900;
 
 		img {
 			transform: scale(var(--scale));
