@@ -23,7 +23,7 @@
 </script>
 
 <Header platformName="MRM Explorer" bind:isSideNavOpen>
-	<img slot="company" src={logo} alt="Stanford University Libraries" />
+	<img slot="company" src={logo} alt="Stanford University Libraries" class="sul-logo" />
 	<svelte:fragment slot="skip-to-content">
 		<SkipToContent />
 	</svelte:fragment>
@@ -60,7 +60,12 @@
 <Notifications />
 
 <style>
-	img {
+	:global(#main-content) {
+		height: calc(100vh - 3rem);
+		overflow: hidden;
+	}
+
+	.sul-logo {
 		height: 30px;
 		margin: 0 1rem 0 0;
 		vertical-align: text-bottom;
