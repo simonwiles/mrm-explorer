@@ -10,7 +10,7 @@
 
 	$effect(() => {
 		let id;
-		if ((id = parseInt(idStr, 10))) {
+		if (idStr !== null && (id = parseInt(idStr, 10))) {
 			fetchImageObjectById(id).then((_imageObject) => (imageObject = _imageObject));
 		}
 	});

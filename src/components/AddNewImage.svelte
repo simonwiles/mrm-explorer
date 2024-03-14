@@ -21,7 +21,11 @@
 		img.decode().then(() => {
 			_imageObject.width = img.naturalWidth;
 			_imageObject.height = img.naturalHeight;
-			upsertImageObject(_imageObject).then(([_, newImageObject]) => {
+			upsertImageObject(_imageObject).then(([, newImageObject]) => {
+				if (newImageObject === null) {
+					console.error(`Failed to add ${name}: ${_imageObject}`);
+					return;
+				}
 				if (redirectOnAdd) {
 					window.location.href = `/view/?id=${newImageObject.id}`;
 				} else {
