@@ -6,33 +6,38 @@ db.version(1).stores({
 	images: '++id, name, imageData, features, width, height'
 });
 
+/**
+ * Fetches all image objects from the database
+ * @return {Promise<ImageObject[]>} An array of image objects
+ */
 export const fetchAllImageObjects = async () => {
 	return await db.table('images').toArray();
 };
 
 /**
- * Generates a live query for all image objects.
- *
- * @return  {import('dexie').Observable<Array<ImageObject & { id: number }>>} An Observable array of image objects.
+ * Return an observable array of image objects (conforming to the Svelte store contract)
+ * @return  {import('dexie').Observable<Array<ImageObject & { id: number }>>} An Observable array of image objects
  */
 export const liveQueryAllImageObjects = () => {
 	return liveQuery(() => db.table('images').toArray());
 };
 
 /**
+ * Fetch an image object from the database
  * @param {number} id
+ * @return {Promise<ImageObject | null>}
  */
 export const fetchImageObjectById = async (id) => {
 	try {
 		return await db.table('images').get(id);
 	} catch (error) {
 		console.error(`Failed to get ID ${id}: ${error}`);
-		return false;
+		return null;
 	}
 };
 
 /**
- * insert or update an image in the database
+ * Insert or update an image in the database
  * @param {ImageObject} imageObject
  * @returns {Promise<[boolean, ImageObject | null]>}
  */
@@ -56,6 +61,7 @@ export const upsertImageObject = async (imageObject) => {
 /**
  * Remove an image object from the database
  * @param {ImageObject & { id: number }} imageObject
+ * @returns {Promise<void>}
  */
 export const removeImageObject = async (imageObject) => {
 	await db.table('images').delete(imageObject.id);
@@ -64,6 +70,7 @@ export const removeImageObject = async (imageObject) => {
 /**
  * Remove an image from the database by ID
  * @param {number} id
+ * @returns {Promise<void>}
  */
 export const removeImageObjectById = async (id) => {
 	await db.table('images').delete(id);
