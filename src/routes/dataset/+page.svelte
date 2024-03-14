@@ -1,8 +1,10 @@
 <script>
 	import { DataTable, Loading, OverflowMenu, OverflowMenuItem } from 'carbon-components-svelte';
-	import { fetchAllImageObjects } from '$lib/db';
+	import { liveQueryAllImageObjects, removeImageObjectById, upsertImageObject } from '$lib/db';
+	import AddNewImage from '@components/AddNewImage.svelte';
+	import { notify } from '@components/Notifications.svelte';
 
-	let rows = $state();
+	let rows = liveQueryAllImageObjects(); // returns a svelte store
 
 	const headers = [
 		{ key: 'id', value: 'ID', width: '8rem' },
@@ -13,9 +15,21 @@
 		{ key: 'actions', empty: true, width: '8rem' }
 	];
 
-	$effect(() => {
-		fetchAllImageObjects().then((images) => (rows = images));
-	});
+	/** @param {ImageObject} imageObject*/
+	async function clearFeatures(imageObject) {
+		imageObject.features = undefined;
+		await upsertImageObject(imageObject);
+		notify({
+			title: 'Features cleared',
+			subtitle: `Features cleared for image "${imageObject.name}"`
+		});
+	}
+
+	/** @param {ImageObject & { id: number } } imageObject*/
+	async function removeImage(imageObject) {
+		await removeImageObjectById(imageObject.id);
+		notify({ title: 'Image removed', subtitle: `Image "${imageObject.name}" removed` });
+	}
 </script>
 
 <svelte:head>
@@ -23,23 +37,35 @@
 	<meta name="description" content="Application for investigating MRM outputs" />
 </svelte:head>
 
-{#if !rows}
+<AddNewImage redirectOnAdd={false} class="add-image" />
+{#if !$rows}
 	<Loading />
-{:else if rows.length === 0}
-	<p>wot no images?</p>
+{:else if $rows.length === 0}
+	<p>Add some images to get started!</p>
 {:else}
-	<DataTable {headers} {rows} class="dataset-table">
+	<DataTable {headers} rows={$rows} class="dataset-table">
 		<svelte:fragment slot="cell" let:row let:cell>
 			{#if cell.key === 'imageData'}
 				<img src={cell.value} alt={cell.value} height="80px" />
 			{:else if cell.key === 'features'}
-				{cell.value.length}
+				{cell.value?.length || 0}
 			{:else if cell.key === 'size'}
 				{row.width}x{row.height}
 			{:else if cell.key === 'actions'}
 				<OverflowMenu flipped>
-					<OverflowMenuItem text="View" />
-					<OverflowMenuItem danger text="Delete" />
+					<OverflowMenuItem text="View" href={`/view/?id=${row.id}`} />
+					<OverflowMenuItem text="Add/Update Features from MRM GeoJSON" />
+					<OverflowMenuItem
+						danger
+						text="Delete Features"
+						disabled={!row.features}
+						onclick={() => clearFeatures(/** @type {ImageObject} */ (row))}
+					/>
+					<OverflowMenuItem
+						danger
+						text="Delete Image"
+						onclick={() => removeImage(/** @type {ImageObject & { id: number }} */ (row))}
+					/>
 				</OverflowMenu>
 			{:else}
 				{cell.value}
