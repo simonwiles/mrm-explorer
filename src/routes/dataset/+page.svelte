@@ -1,6 +1,7 @@
 <script>
 	import { DataTable, Loading, OverflowMenu, OverflowMenuItem } from 'carbon-components-svelte';
 	import { liveQueryAllImageObjects, removeImageObjectById, upsertImageObject } from '$lib/db';
+	import { formatBytes } from '$lib/storage';
 	import AddNewImages from '@/components/AddNewImages.svelte';
 	import { notify } from '@components/Notifications.svelte';
 
@@ -10,7 +11,8 @@
 		{ key: 'id', value: 'ID' },
 		{ key: 'name', value: 'Name' },
 		{ key: 'features', value: '# Features' },
-		{ key: 'size', value: 'Size' },
+		{ key: 'size', value: 'Image Size' },
+		{ key: 'bytes', value: 'Size in Database' },
 		{ key: 'imageData', value: 'Image' },
 		{ key: 'actions', empty: true }
 	];
@@ -52,6 +54,8 @@
 					{cell.value?.length || 0}
 				{:else if cell.key === 'size'}
 					{row.width}x{row.height}
+				{:else if cell.key === 'bytes'}
+					{formatBytes(row.imageData.length)}
 				{:else if cell.key === 'actions'}
 					<OverflowMenu flipped>
 						<OverflowMenuItem text="View" href={`/view/?id=${row.id}`} />
@@ -79,10 +83,16 @@
 <style>
 	.container {
 		display: grid;
+		gap: 1rem;
 		grid-template-columns: 1fr;
 		grid-template-rows: auto 1fr;
 		height: 100%;
 		overflow: hidden;
+	}
+
+	p {
+		font-size: 1.2rem;
+		margin-left: 1rem;
 	}
 
 	:global(.dataset-table) {
