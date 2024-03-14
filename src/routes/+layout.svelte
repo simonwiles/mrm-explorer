@@ -15,6 +15,7 @@
 	import SearchLocate from 'carbon-icons-svelte/lib/SearchLocate.svelte';
 
 	import Notifications from '@components/Notifications.svelte';
+	import ConfirmationModal from '@components/ConfirmationModal.svelte';
 	import '@/carbon-theming.css';
 
 	import logo from '../img/sul.41x40.png';
@@ -58,6 +59,7 @@
 </Content>
 
 <Notifications />
+<ConfirmationModal />
 
 <style>
 	:global(#main-content) {
