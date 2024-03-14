@@ -1,5 +1,15 @@
 <script>
-	import { DataTable, Loading, OverflowMenu, OverflowMenuItem } from 'carbon-components-svelte';
+	import {
+		Button,
+		DataTable,
+		Loading,
+		OverflowMenu,
+		OverflowMenuItem,
+		Toolbar,
+		ToolbarSearch,
+		ToolbarContent
+	} from 'carbon-components-svelte';
+	import TrashCan from 'carbon-icons-svelte/lib/TrashCan.svelte';
 	import { liveQueryAllImageObjects, removeImageObjectById, upsertImageObject } from '$lib/db';
 	import { formatBytes } from '$lib/storage';
 	import AddNewImages from '@/components/AddNewImages.svelte';
@@ -47,6 +57,21 @@
 		<p>Add some images to get started!</p>
 	{:else}
 		<DataTable {headers} rows={$rows} stickyHeader class="dataset-table">
+			<Toolbar>
+				<ToolbarContent>
+					<ToolbarSearch
+						placeholder="Coming Soon..."
+						on:change={() => {
+							notify({
+								title: 'Search',
+								subtitle: 'Table filtering not yet implemented (sorry!)...'
+							});
+						}}
+					/>
+					<Button iconDescription="Delete all" icon={TrashCan}>Delete All</Button>
+				</ToolbarContent>
+			</Toolbar>
+
 			<svelte:fragment slot="cell" let:row let:cell>
 				{#if cell.key === 'imageData'}
 					<img src={cell.value} alt={cell.value} height="80px" />
