@@ -76,10 +76,18 @@ export const removeImageObject = async (imageObject) => {
 };
 
 /**
- * Remove an image from the database by ID
+ * Remove an image object from the database by ID
  * @param {number} id
  * @returns {Promise<void>}
  */
 export const removeImageObjectById = async (id) => {
 	await db.table('images').delete(id);
+};
+
+/**
+ * Remove all image objects from the database
+ * @returns {Promise<void>}
+ */
+export const removeAllImageObjects = async () => {
+	await db.table('images').clear();
 };
