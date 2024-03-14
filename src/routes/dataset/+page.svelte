@@ -11,10 +11,16 @@
 		Tooltip
 	} from 'carbon-components-svelte';
 	import TrashCan from 'carbon-icons-svelte/lib/TrashCan.svelte';
-	import { liveQueryAllImageObjects, removeImageObjectById, upsertImageObject } from '$lib/db';
+	import {
+		liveQueryAllImageObjects,
+		removeAllImageObjects,
+		removeImageObjectById,
+		upsertImageObject
+	} from '$lib/db';
 	import { formatBytes } from '$lib/storage';
 	import AddNewImages from '@/components/AddNewImages.svelte';
 	import { notify } from '@components/Notifications.svelte';
+	import { confirm } from '@components/ConfirmationModal.svelte';
 
 	let rows = liveQueryAllImageObjects(); // returns a svelte store
 
@@ -69,7 +75,21 @@
 							});
 						}}
 					/>
-					<Button iconDescription="Delete all" icon={TrashCan}>Delete All</Button>
+					<Button
+						iconDescription="Delete all"
+						icon={TrashCan}
+						on:click={() => {
+							confirm('Are you sure you want to delete all images?')
+								.then(() => {
+									removeAllImageObjects().then(() => {
+										notify({ title: 'All images deleted', subtitle: 'All images deleted' });
+									});
+								})
+								.catch(() => {
+									notify({ title: 'Action canceled' });
+								});
+						}}>Delete All</Button
+					>
 				</ToolbarContent>
 			</Toolbar>
 
