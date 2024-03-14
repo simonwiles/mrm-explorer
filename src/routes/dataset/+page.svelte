@@ -1,7 +1,7 @@
 <script>
 	import { DataTable, Loading, OverflowMenu, OverflowMenuItem } from 'carbon-components-svelte';
 	import { liveQueryAllImageObjects, removeImageObjectById, upsertImageObject } from '$lib/db';
-	import AddNewImage from '@components/AddNewImage.svelte';
+	import AddNewImages from '@/components/AddNewImages.svelte';
 	import { notify } from '@components/Notifications.svelte';
 
 	let rows = liveQueryAllImageObjects(); // returns a svelte store
@@ -38,7 +38,7 @@
 </svelte:head>
 
 <div class="container">
-	<AddNewImage redirectOnAdd={false} class="add-image" />
+	<AddNewImages redirectOnAdd={false} class="add-image" />
 	{#if !$rows}
 		<Loading />
 	{:else if $rows.length === 0}

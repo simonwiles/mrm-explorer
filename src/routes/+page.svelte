@@ -3,7 +3,7 @@
 	import { formatBytes, storageUsage } from '$lib/storage';
 	import { Button, Loading, Tile } from 'carbon-components-svelte';
 	import ArrowRight from 'carbon-icons-svelte/lib/ArrowRight.svelte';
-	import AddNewImage from '@components/AddNewImage.svelte';
+	import AddNewImages from '@/components/AddNewImages.svelte';
 
 	const countPromise = countImageObjects();
 	const storageUsagePromise = storageUsage();
@@ -45,7 +45,7 @@
 		{/if}
 	{/await}
 
-	<AddNewImage redirectOnAdd={true} />
+	<AddNewImages redirectOnAdd={true} />
 </section>
 
 <style>
