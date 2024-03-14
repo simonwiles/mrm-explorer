@@ -4,8 +4,8 @@
 	import { Loading } from 'carbon-components-svelte';
 	import Viewer from '@components/Viewer.svelte';
 
-	/** @type {ImageObject | false} */
-	let imageObject = $state(false);
+	/** @type {ImageObject | undefined | null} */
+	let imageObject = $state();
 	let idStr = $page.url.searchParams.get('id');
 
 	$effect(() => {
@@ -24,9 +24,9 @@
 {#if !idStr}
 	<p>no id?</p>
 {:else if imageObject === undefined}
-	<p>bad id?</p>
-{:else if !imageObject}
 	<Loading />
+{:else if imageObject === null}
+	<p>bad id?</p>
 {:else}
 	<Viewer {imageObject} />
 {/if}
