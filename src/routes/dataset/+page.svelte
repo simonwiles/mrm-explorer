@@ -7,7 +7,8 @@
 		OverflowMenuItem,
 		Toolbar,
 		ToolbarSearch,
-		ToolbarContent
+		ToolbarContent,
+		Tooltip
 	} from 'carbon-components-svelte';
 	import TrashCan from 'carbon-icons-svelte/lib/TrashCan.svelte';
 	import { liveQueryAllImageObjects, removeImageObjectById, upsertImageObject } from '$lib/db';
@@ -54,7 +55,7 @@
 	{#if !$rows}
 		<Loading />
 	{:else if $rows.length === 0}
-		<p>Add some images to get started!</p>
+		<p class="get-started">Add some images to get started!</p>
 	{:else}
 		<DataTable {headers} rows={$rows} stickyHeader class="dataset-table">
 			<Toolbar>
@@ -72,6 +73,16 @@
 				</ToolbarContent>
 			</Toolbar>
 
+			<svelte:fragment slot="cell-header" let:header>
+				{#if header.key === 'bytes'}
+					{header.value}
+					<Tooltip direction="bottom">
+						<p>May not correspond exactly to the size of the image on disk.</p>
+					</Tooltip>
+				{:else}
+					{header.value}
+				{/if}
+			</svelte:fragment>
 			<svelte:fragment slot="cell" let:row let:cell>
 				{#if cell.key === 'imageData'}
 					<img src={cell.value} alt={cell.value} height="80px" />
@@ -115,7 +126,7 @@
 		overflow: hidden;
 	}
 
-	p {
+	p.get-started {
 		font-size: 1.2rem;
 		margin-left: 1rem;
 	}
@@ -133,6 +144,10 @@
 	:global(.dataset-table table) {
 		height: 100%;
 		max-height: fit-content;
+	}
+
+	:global(.dataset-table thead) {
+		overflow: visible;
 	}
 
 	:global(.dataset-table tbody) {
@@ -157,6 +172,16 @@
 
 	:global(.dataset-table tr > :nth-child(2)) {
 		justify-content: left;
+	}
+
+	:global(.dataset-table .bx--table-header-label) {
+		display: flex;
+		align-items: flex-start;
+		overflow: visible;
+	}
+
+	:global(.bx--tooltip__content) {
+		white-space: initial;
 	}
 
 	img {
