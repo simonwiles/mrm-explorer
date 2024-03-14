@@ -3,7 +3,7 @@ import Dexie, { liveQuery } from 'dexie';
 
 export const db = new Dexie('mrmExplorer');
 db.version(1).stores({
-	images: '++id, name, imageData, features, width, height'
+	images: '++id, name'
 });
 
 /**
