@@ -7,7 +7,15 @@ db.version(1).stores({
 });
 
 /**
- * Fetches all image objects from the database
+ * Count the number of image objects in the 'images' table
+ * @return {Promise<number>} The count of image objects
+ */
+export const countImageObjects = async () => {
+	return await db.table('images').count();
+};
+
+/**
+ * Fetch all image objects from the database
  * @return {Promise<ImageObject[]>} An array of image objects
  */
 export const fetchAllImageObjects = async () => {
