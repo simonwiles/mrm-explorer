@@ -1,45 +1,23 @@
 <script>
-	import '$lib/types.js';
-
 	import { tick, unstate } from 'svelte';
 
 	import {
 		Button,
 		FileUploaderDropContainer,
-		Loading,
 		Toolbar,
 		ToolbarContent
 	} from 'carbon-components-svelte';
 	import { CloseLarge } from 'carbon-icons-svelte';
 
-	import { fetchAllImageObjects, removeImageObject, upsertImageObject } from '$lib/db';
+	import { upsertImageObject } from '$lib/db';
 	import { tooltip } from '$lib/actions/tooltip';
 	import { wheelZoom } from '$lib/actions/wheel-zoom';
 
-	import { notify } from '@components/Notifications.svelte';
-
-	let imageObject = $state();
+	/** @type {{imageObject: ImageObject}} */
+	let { imageObject } = $props();
 	let imageEl = $state();
 	let toolbarWidth = $state();
 	let svg = $state();
-
-	/**
-	 * @param {string} name name of the image
-	 * @param {string} imageData base64 encoded image
-	 */
-	async function addImage(name, imageData) {
-		/** @type {ImageObject} */
-		const _imageObject = { name, imageData };
-		const img = new Image();
-		img.src = imageData;
-		img.decode().then(() => {
-			_imageObject.width = img.naturalWidth;
-			_imageObject.height = img.naturalHeight;
-			upsertImageObject(_imageObject).then(([_, newImageObject]) => {
-				imageObject = newImageObject;
-			});
-		});
-	}
 
 	/**
 	 * @param {{features: Array<Feature>}} mrmGeoJson
@@ -49,12 +27,6 @@
 		await tick();
 		createFeaturePaths(mrmGeoJson.features);
 		upsertImageObject(unstate(imageObject));
-	}
-
-	async function removeImage() {
-		await removeImageObject(imageObject);
-		notify({ title: 'Image removed', subtitle: `Image "${imageObject.name}" removed` });
-		imageObject = false;
 	}
 
 	/**
@@ -96,16 +68,9 @@
 	};
 
 	$effect(() => {
-		fetchAllImageObjects().then((images) => {
-			if (images.length > 0) {
-				imageObject = images[0];
-				if (imageObject.features) {
-					tick().then(() => createFeaturePaths(imageObject.features));
-				}
-			} else {
-				imageObject = false;
-			}
-		});
+		if (imageObject.features) {
+			tick().then(() => createFeaturePaths(imageObject.features || []));
+		}
 	});
 
 	$effect(() => {
@@ -118,33 +83,6 @@
 		imageEl && setTimeout(() => (toolbarWidth = imageEl.width + 'px'), 0);
 	});
 </script>
-
-{#if imageObject === undefined}
-	<Loading />
-{/if}
-
-{#if imageObject === false}
-	<FileUploaderDropContainer
-		on:change={({ detail: files }) => {
-			const file = files[0];
-			if (!file.type || !file.type.startsWith('image/')) {
-				alert('Only image files are accepted');
-				return;
-			}
-			const reader = new FileReader();
-			reader.addEventListener(
-				'load',
-				() => typeof reader.result === 'string' && addImage(file.name, reader.result),
-				false
-			);
-			reader.readAsDataURL(file);
-		}}
-	>
-		<span class="file-upload-dropzone" slot="labelText">
-			Drag and drop map or other image here<br />(or click to upload)
-		</span>
-	</FileUploaderDropContainer>
-{/if}
 
 {#if imageObject}
 	<div class="viewer">
@@ -176,7 +114,7 @@
 				<Button
 					icon={CloseLarge}
 					iconDescription="Close"
-					on:click={removeImage}
+					href="/"
 					tooltipPosition="left"
 					tooltipAlignment="end"
 				/>
@@ -201,26 +139,11 @@
 {/if}
 
 <style>
-	:global(#main-content) {
-		height: calc(100vh - 3rem);
-		overflow: hidden;
-	}
-
 	.viewer {
 		display: grid;
 		grid-template-columns: max-content;
 		grid-template-rows: max-content;
 		height: 100%;
-	}
-
-	.file-upload-dropzone {
-		align-items: center;
-		display: flex;
-		height: 100%;
-		justify-content: center;
-		text-align: center;
-		vertical-align: middle;
-		width: 100%;
 	}
 
 	.image-name {
