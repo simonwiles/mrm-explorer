@@ -3,7 +3,7 @@
  * 	usage.usage -> Bytes used.
  *	usage.quota -> Maximum number of bytes available.
  * See https://developer.mozilla.org/en-US/docs/Web/API/StorageManager/estimate
- * @return {Promise<StorageEstimate | Error | unknown>} The storage estimate object containing usage and quota information
+ * @return {Promise<StorageEstimate | undefined >} The storage estimate object containing usage and quota information
  */
 export const storageUsage = async () => {
 	try {
@@ -13,9 +13,8 @@ export const storageUsage = async () => {
 		}
 		throw new Error('navigator.storage is not available');
 	} catch (error) {
-		// `error` is not guaranteed to be an instance of `Error`...
 		console.error(`Failed to get storage stats: ${error}`);
-		return error;
+		new Error(`error: ${error}`);
 	}
 };
 
