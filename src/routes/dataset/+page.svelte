@@ -11,6 +11,7 @@
 		Tooltip
 	} from 'carbon-components-svelte';
 	import TrashCan from 'carbon-icons-svelte/lib/TrashCan.svelte';
+
 	import {
 		liveQueryAllImageObjects,
 		removeAllImageObjects,
@@ -18,7 +19,9 @@
 		upsertImageObject
 	} from '$lib/db';
 	import { formatBytes } from '$lib/storage';
-	import AddNewImages from '@/components/AddNewImages.svelte';
+
+	import AddNewImages from '@components/AddNewImages.svelte';
+	import AddFeaturesFromJson from '@components/AddFeaturesFromJson.svelte';
 	import { notify } from '@components/Notifications.svelte';
 	import { confirm } from '@components/ConfirmationModal.svelte';
 
@@ -107,7 +110,12 @@
 				{#if cell.key === 'imageBlob'}
 					<img src={URL.createObjectURL(cell.value)} alt={row.name} height="80px" />
 				{:else if cell.key === 'features'}
-					{cell.value?.length || 0}
+					{#if cell.value}
+						{cell.value.length}
+					{:else}
+						{@const imageObject = /** @type {ImageObject} */ (row)}
+						<AddFeaturesFromJson {imageObject} />
+					{/if}
 				{:else if cell.key === 'size'}
 					{row.width}x{row.height}
 				{:else if cell.key === 'bytes'}
