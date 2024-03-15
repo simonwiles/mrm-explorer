@@ -11,13 +11,13 @@
 
 	/**
 	 * @param {string} name name of the image
-	 * @param {string} imageData base64 encoded image
+	 * @param {Blob} imageBlob image blob
 	 */
-	async function addImageToDb(name, imageData) {
+	async function addImageToDb(name, imageBlob) {
 		/** @type {ImageObject} */
-		const _imageObject = { name, imageData };
+		const _imageObject = { name, imageBlob };
 		const img = new Image();
-		img.src = imageData;
+		img.src = URL.createObjectURL(imageBlob);
 		img.decode().then(() => {
 			_imageObject.width = img.naturalWidth;
 			_imageObject.height = img.naturalHeight;
@@ -49,13 +49,7 @@
 			alert(`Only image files are accepted (file "${file.name}" rejected).`);
 			return;
 		}
-		const reader = new FileReader();
-		reader.addEventListener(
-			'load',
-			() => typeof reader.result === 'string' && addImageToDb(file.name, reader.result),
-			false
-		);
-		reader.readAsDataURL(file);
+		addImageToDb(file.name, file);
 	}
 </script>
 

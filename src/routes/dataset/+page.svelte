@@ -30,7 +30,7 @@
 		{ key: 'features', value: '# Features' },
 		{ key: 'size', value: 'Image Size' },
 		{ key: 'bytes', value: 'Size in Database' },
-		{ key: 'imageData', value: 'Image' },
+		{ key: 'imageBlob', value: 'Image' },
 		{ key: 'actions', empty: true }
 	];
 
@@ -104,14 +104,14 @@
 				{/if}
 			</svelte:fragment>
 			<svelte:fragment slot="cell" let:row let:cell>
-				{#if cell.key === 'imageData'}
-					<img src={cell.value} alt={cell.value} height="80px" />
+				{#if cell.key === 'imageBlob'}
+					<img src={URL.createObjectURL(cell.value)} alt={row.name} height="80px" />
 				{:else if cell.key === 'features'}
 					{cell.value?.length || 0}
 				{:else if cell.key === 'size'}
 					{row.width}x{row.height}
 				{:else if cell.key === 'bytes'}
-					{formatBytes(row.imageData.length)}
+					{formatBytes(row.imageBlob.size)}
 				{:else if cell.key === 'actions'}
 					<OverflowMenu flipped>
 						<OverflowMenuItem text="View" href={`/view/?id=${row.id}`} />

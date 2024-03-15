@@ -126,7 +126,11 @@
 			use:wheelZoom
 			style="--aspect-ratio: {imageObject.width} / {imageObject.height}"
 		>
-			<img src={imageObject.imageData} alt={imageObject.name} bind:this={imageEl} />
+			<img
+				src={URL.createObjectURL(imageObject.imageBlob)}
+				alt={imageObject.name}
+				bind:this={imageEl}
+			/>
 			{#if imageObject.features}
 				<svg
 					xmlns="http://www.w3.org/2000/svg"

@@ -2,7 +2,7 @@
  * @typedef {Object} ImageObject
  * @property {number} [id] internal database id
  * @property {string} name name of the image
- * @property {string} imageData base64 encoded image
+ * @property {Blob} imageBlob binary image blob
  * @property {Array<Feature>} [features] the `features` property of the MRM GeoJSON
  * @property {number} [width]
  * @property {number} [height]
