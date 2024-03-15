@@ -1,6 +1,6 @@
 <script>
+	import { panZoom } from '@/lib/actions/pan-zoom';
 	import { tooltip } from '$lib/actions/tooltip';
-	import { wheelZoom } from '$lib/actions/wheel-zoom';
 
 	/** @type {{imageObject: ImageObject}} */
 	let { imageObject } = $props();
@@ -53,7 +53,7 @@
 
 <div
 	class="image-container"
-	use:wheelZoom
+	use:panZoom
 	style="--aspect-ratio: {imageObject.width} / {imageObject.height}"
 >
 	<img src={URL.createObjectURL(imageObject.imageBlob)} alt={imageObject.name} />
@@ -66,7 +66,6 @@
 
 <style>
 	.image-container {
-		--scale: 1;
 		aspect-ratio: var(--aspect-ratio);
 		height: 100%;
 		overflow: hidden;
@@ -74,8 +73,6 @@
 		width: 100%;
 
 		img {
-			scale: var(--scale);
-			transform-origin: var(--transform-origin-X) var(--transform-origin-Y);
 			max-height: 100%;
 			max-width: 100%;
 		}
@@ -85,15 +82,13 @@
 			max-height: 100%;
 			max-width: 100%;
 			position: absolute;
-			scale: var(--scale);
 			top: 0;
-			transform-origin: var(--transform-origin-X) var(--transform-origin-Y);
 		}
 
 		svg :global(path) {
 			fill: transparent;
 			stroke: #44f8;
-			stroke-width: calc(6px / var(--scale));
+			stroke-width: 6px;
 		}
 
 		svg :global(path.marked) {
