@@ -51,21 +51,28 @@
 	});
 </script>
 
-<div
-	class="image-container"
-	use:panZoom
-	style="--aspect-ratio: {imageObject.width} / {imageObject.height}"
->
-	<img src={URL.createObjectURL(imageObject.imageBlob)} alt={imageObject.name} />
-	<svg
-		xmlns="http://www.w3.org/2000/svg"
-		viewBox={`0 0 ${imageObject.width} ${imageObject.height}`}
-		bind:this={svg}
-	></svg>
+<div class="outer">
+	<div
+		class="panzoom-container"
+		use:panZoom
+		style="--aspect-ratio: {imageObject.width} / {imageObject.height}"
+	>
+		<img src={URL.createObjectURL(imageObject.imageBlob)} alt={imageObject.name} />
+		<svg
+			xmlns="http://www.w3.org/2000/svg"
+			viewBox={`0 0 ${imageObject.width} ${imageObject.height}`}
+			bind:this={svg}
+		></svg>
+	</div>
 </div>
 
 <style>
-	.image-container {
+	.outer {
+		height: 100%;
+		width: 100%;
+	}
+
+	.panzoom-container {
 		aspect-ratio: var(--aspect-ratio);
 		height: 100%;
 		overflow: hidden;
