@@ -4,51 +4,6 @@
 
 	/** @type {{imageObject: ImageObject}} */
 	let { imageObject } = $props();
-	let svg = $state();
-
-	/**
-	 * @param {Array<Feature>} features
-	 */
-	const createFeaturePaths = (features) => {
-		features.forEach((feature, i) => {
-			const featurePath = createFeaturePath(feature, i);
-			svg.appendChild(featurePath);
-
-			tooltip(featurePath, {
-				placement: 'top',
-				arrow: true,
-				allowHTML: true
-			});
-		});
-	};
-
-	/**
-	 * @param {Feature} feature
-	 * @param {number} i
-	 */
-	const createFeaturePath = (feature, i) => {
-		const featurePath = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-		const vertices = feature.geometry.coordinates[0].map(([x, y]) => [x, 1 - y]);
-		const path = [];
-		path.push(`M ${vertices[0][0]} ${vertices[0][1]}`);
-		vertices.slice(1).forEach(([x, y]) => path.push(`L ${x} ${y}`));
-		path.push('Z');
-		featurePath.setAttribute('d', path.join(' '));
-		featurePath.setAttribute('data-idx', `${i}`);
-		featurePath.setAttribute('data-text', feature.properties.text);
-		featurePath.setAttribute('data-score', feature.properties.score.toFixed(4));
-		featurePath.setAttribute(
-			'data-tippy-content',
-			`text: ${feature.properties.text}<br>score: ${feature.properties.score}`
-		);
-		return featurePath;
-	};
-
-	$effect(() => {
-		if (imageObject.features) {
-			createFeaturePaths(imageObject.features || []);
-		}
-	});
 </script>
 
 <div class="outer">
@@ -61,8 +16,22 @@
 		<svg
 			xmlns="http://www.w3.org/2000/svg"
 			viewBox={`0 0 ${imageObject.width} ${imageObject.height}`}
-			bind:this={svg}
-		></svg>
+		>
+			{#each imageObject.features || [] as feature, i}
+				{@const vertices = feature.geometry.coordinates[0].map(([x, y]) => [x, 1 - y])}
+				<path
+					d={`M ${vertices[0][0]} ${vertices[0][1]} ${vertices
+						.slice(1)
+						.map(([x, y]) => `L ${x} ${y}`)
+						.join(' ')} Z`}
+					data-idx={i}
+					data-text={feature.properties.text}
+					data-score={feature.properties.score.toFixed(4)}
+					data-tippy-content={`text: ${feature.properties.text}<br>score: ${feature.properties.score}`}
+					use:tooltip={{ allowHTML: true }}
+				/>
+			{/each}
+		</svg>
 	</div>
 </div>
 
