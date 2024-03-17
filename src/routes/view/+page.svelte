@@ -9,7 +9,6 @@
 
 	/** @type {ImageObject | undefined | null} */
 	let imageObject = $state();
-	let idStr = $page.url.searchParams.get('id');
 
 	let search = $state();
 	let markedCount = $state(0);
@@ -18,13 +17,19 @@
 	const setMarkedCount = (count) => (markedCount = count);
 
 	$effect(() => {
+		if (imageObject) return;
+		const idStr = $page.url.searchParams.get('id');
 		let id;
 		if (idStr !== null && (id = parseInt(idStr, 10))) {
-			fetchImageObjectById(id).then((_imageObject) => (imageObject = _imageObject));
+			// Promised resolves with undefined if not found
+			//  (but we want null for an invalid ID)
+			fetchImageObjectById(id).then((_imageObject) => (imageObject = _imageObject || null));
 		} else {
 			imageObject = null;
 		}
 	});
+
+	$inspect(imageObject);
 </script>
 
 <svelte:head>
@@ -32,7 +37,7 @@
 	<meta name="description" content="Application for investigating MRM outputs" />
 </svelte:head>
 
-{#if !idStr || imageObject === null}
+{#if imageObject === null}
 	<InlineNotification hideCloseButton kind="error" title="Invalid Image ID">
 		<span slot="subtitle">
 			Please specify a valid ID in the URL or
