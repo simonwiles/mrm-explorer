@@ -1,9 +1,10 @@
 <script>
-	import { countImageObjects } from '$lib/db';
-	import { formatBytes, storageUsage } from '$lib/storage';
+	import { base } from '$app/paths';
 	import { Button, Loading, Tile } from 'carbon-components-svelte';
 	import ArrowRight from 'carbon-icons-svelte/lib/ArrowRight.svelte';
-	import AddNewImages from '@/components/AddNewImages.svelte';
+	import { countImageObjects } from '$lib/db';
+	import { formatBytes, storageUsage } from '$lib/storage';
+	import AddNewImages from '@components/AddNewImages.svelte';
 
 	const countPromise = countImageObjects();
 	const storageUsagePromise = storageUsage();
@@ -40,7 +41,7 @@
 						<p>{error.message}</p>
 					{/await}
 				</div>
-				<Button href="/dataset" icon={ArrowRight}>Explore the dataset</Button>
+				<Button href="{base}/dataset" icon={ArrowRight}>Explore the dataset</Button>
 			</div>
 		{/if}
 	{/await}

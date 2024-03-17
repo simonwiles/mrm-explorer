@@ -1,4 +1,5 @@
 <script>
+	import { base } from '$app/paths';
 	import {
 		Button,
 		DataTable,
@@ -122,7 +123,7 @@
 					{formatBytes(row.imageBlob.size)}
 				{:else if cell.key === 'actions'}
 					<OverflowMenu flipped>
-						<OverflowMenuItem text="View" href={`/view/?id=${row.id}`} />
+						<OverflowMenuItem text="View" href={`${base}/view/?id=${row.id}`} />
 						<OverflowMenuItem text="Add/Update Features from MRM GeoJSON" />
 						<OverflowMenuItem
 							danger

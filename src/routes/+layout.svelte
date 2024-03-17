@@ -1,4 +1,5 @@
 <script>
+	import { base } from '$app/paths';
 	import { page } from '$app/stores';
 	import {
 		Content,
@@ -32,17 +33,17 @@
 
 <SideNav bind:isOpen={isSideNavOpen} rail>
 	<SideNavItems>
-		<SideNavLink icon={Home} text="Home" href="/" isSelected={$page.url.pathname == '/'} />
+		<SideNavLink icon={Home} text="Home" href="{base}/" isSelected={$page.url.pathname == '/'} />
 		<SideNavLink
 			icon={DataBase}
 			text="Dataset"
-			href="/dataset/"
+			href="{base}/dataset/"
 			isSelected={$page.url.pathname == '/dataset'}
 		/>
 		<SideNavLink
 			icon={SearchLocate}
 			text="Search Interface"
-			href="/search/"
+			href="{base}/search/"
 			isSelected={$page.url.pathname == '/search'}
 		/>
 		<SideNavDivider />

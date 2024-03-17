@@ -1,9 +1,10 @@
 <script>
+	import { base } from '$app/paths';
 	import { page } from '$app/stores';
 	import { InlineNotification, Link, Loading, Search } from 'carbon-components-svelte';
 
 	import { fetchImageObjectById } from '$lib/db';
-	import { formatBytes } from '@/lib/storage';
+	import { formatBytes } from '$lib/storage';
 	import AddFeaturesFromJson from '@components/AddFeaturesFromJson.svelte';
 	import Viewer from '@components/Viewer.svelte';
 
@@ -41,7 +42,7 @@
 	<InlineNotification hideCloseButton kind="error" title="Invalid Image ID">
 		<span slot="subtitle">
 			Please specify a valid ID in the URL or
-			<Link inline href="/dataset/">explore the dataset.</Link>.
+			<Link inline href="{base}/dataset/">explore the dataset.</Link>.
 		</span>
 	</InlineNotification>
 {:else if imageObject === undefined}
