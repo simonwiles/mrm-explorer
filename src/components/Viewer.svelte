@@ -2,8 +2,26 @@
 	import { panZoom } from '@/lib/actions/pan-zoom';
 	import { tooltip } from '$lib/actions/tooltip';
 
-	/** @type {{imageObject: ImageObject}} */
-	let { imageObject } = $props();
+	/**
+	 * @typedef {Object} ViewerProps
+	 * @property {ImageObject} imageObject Image object to view
+	 * @property {string | function} [search] String to search for or callback function to use for marking features
+	 */
+
+	/** @type {ViewerProps} */
+	let { imageObject, search } = $props();
+
+	/** @type {function} */
+	let markFeature = $state(() => false);
+
+	$effect(() => {
+		if (typeof search === 'function') {
+			markFeature = search;
+		} else if (typeof search === 'string' && search !== '') {
+			markFeature = (/** @type {FeatureProperty} */ featureProps) =>
+				featureProps.text.toLowerCase().includes(/** @type string */ (search));
+		}
+	});
 </script>
 
 <div class="outer">
@@ -29,6 +47,7 @@
 					data-score={feature.properties.score.toFixed(4)}
 					data-tippy-content={`text: ${feature.properties.text}<br>score: ${feature.properties.score}`}
 					use:tooltip={{ allowHTML: true }}
+					class:marked={markFeature(feature.properties)}
 				/>
 			{/each}
 		</svg>

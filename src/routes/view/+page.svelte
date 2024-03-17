@@ -1,6 +1,6 @@
 <script>
 	import { page } from '$app/stores';
-	import { InlineNotification, Link, Loading } from 'carbon-components-svelte';
+	import { InlineNotification, Link, Loading, Search } from 'carbon-components-svelte';
 
 	import { fetchImageObjectById } from '$lib/db';
 	import { formatBytes } from '@/lib/storage';
@@ -10,6 +10,8 @@
 	/** @type {ImageObject | undefined | null} */
 	let imageObject = $state();
 	let idStr = $page.url.searchParams.get('id');
+
+	let search = $state();
 
 	$effect(() => {
 		let id;
@@ -56,8 +58,11 @@
 					</dd>
 				</dl>
 			{/if}
+			<div class="search">
+				<Search bind:value={search} />
+			</div>
 		</div>
-		<Viewer {imageObject} />
+		<Viewer {imageObject} {search} />
 	</div>
 {/if}
 
@@ -70,10 +75,17 @@
 		gap: 1rem;
 	}
 
+	.info {
+		display: flex;
+		flex-direction: row;
+		gap: 2rem;
+	}
+
 	dl {
 		display: grid;
 		gap: 0.5rem 2rem;
 		grid-template-columns: auto 1fr;
+		margin: 0.5rem 0;
 
 		& > * {
 			margin: 0;
