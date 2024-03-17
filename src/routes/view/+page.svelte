@@ -12,6 +12,10 @@
 	let idStr = $page.url.searchParams.get('id');
 
 	let search = $state();
+	let markedCount = $state(0);
+
+	/** @param {number} count */
+	const setMarkedCount = (count) => (markedCount = count);
 
 	$effect(() => {
 		let id;
@@ -24,7 +28,7 @@
 </script>
 
 <svelte:head>
-	<title>Viewer {imageObject ? `"${imageObject.name}"` : ''} | MRM Explorer</title>
+	<title>{imageObject ? `${imageObject.name}` : 'Viewer'} | MRM Explorer</title>
 	<meta name="description" content="Application for investigating MRM outputs" />
 </svelte:head>
 
@@ -60,9 +64,18 @@
 			{/if}
 			<div class="search">
 				<Search bind:value={search} />
+				{#if search}
+					<span class="marked-count">
+						{#if markedCount}
+							{markedCount} feature{markedCount > 1 ? 's' : ''} marked
+						{:else}
+							No features matched!
+						{/if}
+					</span>
+				{/if}
 			</div>
 		</div>
-		<Viewer {imageObject} {search} />
+		<Viewer {imageObject} {search} {setMarkedCount} />
 	</div>
 {/if}
 
@@ -72,7 +85,7 @@
 		flex-direction: column;
 		height: 100%;
 		position: relative;
-		gap: 1rem;
+		gap: 2rem;
 	}
 
 	.info {
@@ -90,5 +103,16 @@
 		& > * {
 			margin: 0;
 		}
+	}
+
+	.search {
+		display: flex;
+		align-items: flex-end;
+		gap: 1rem;
+		flex-direction: column;
+	}
+
+	.marked-count {
+		white-space: nowrap;
 	}
 </style>
