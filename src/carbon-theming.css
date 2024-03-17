@@ -18,6 +18,14 @@
 	color: var(--primary-hover);
 }
 
+.bx--inline-notification:not(.bx--inline-notification--low-contrast) a {
+	color: var(--primary-active);
+
+	&:hover {
+		color: var(--primary);
+	}
+}
+
 .bx--btn--primary {
 	background-color: var(--primary);
 
