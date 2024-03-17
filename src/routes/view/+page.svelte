@@ -4,6 +4,7 @@
 
 	import { fetchImageObjectById } from '$lib/db';
 	import { formatBytes } from '@/lib/storage';
+	import AddFeaturesFromJson from '@components/AddFeaturesFromJson.svelte';
 	import Viewer from '@components/Viewer.svelte';
 
 	/** @type {ImageObject | undefined | null} */
@@ -46,7 +47,13 @@
 					<dt>Image Size:</dt>
 					<dd>{formatBytes(imageObject.imageBlob.size)}</dd>
 					<dt>Feature Count</dt>
-					<dd>{imageObject.features?.length}</dd>
+					<dd>
+						{#if imageObject.features}
+							{imageObject.features.length}
+						{:else}
+							<AddFeaturesFromJson {imageObject} />
+						{/if}
+					</dd>
 				</dl>
 			{/if}
 		</div>

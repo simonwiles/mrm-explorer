@@ -38,7 +38,7 @@
 
 <style>
 	:global(.add-json) {
-		inline-size: auto;
+		inline-size: fit-content;
 		overflow: hidden;
 	}
 
