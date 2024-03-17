@@ -2,8 +2,9 @@
 	import { Search } from 'carbon-components-svelte';
 	import { db } from '$lib/db';
 
-	let search = $state();
+	/** @type {FeatureMatch[]} */
 	let matches = $state([]);
+	let search = $state();
 	let totalImages = $state(0);
 	let totalFeatures = $state(0);
 

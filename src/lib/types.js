@@ -26,3 +26,9 @@
  * @property {string} text
  * @property {number} score
  */
+
+/** @typedef {Object} FeatureMatch
+ * @property {ImageObject} imageObject
+ * @property {Feature} feature
+ * @property {number} featureIdx
+ */
