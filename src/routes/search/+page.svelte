@@ -1,9 +1,10 @@
 <script>
 	import { Search } from 'carbon-components-svelte';
 	import { db } from '$lib/db';
+	import { debounce } from '$lib/debounce';
 
-	/** @type {FeatureMatch[]} */
-	let matches = $state([]);
+	/** @type {FeatureMatch[] | undefined} */
+	let matches = $state();
 	let search = $state();
 	let totalImages = $state(0);
 	let totalFeatures = $state(0);
@@ -15,19 +16,27 @@
 		});
 	});
 
-	$effect(() => {
-		matches = [];
-		if (!search) return;
-		db.table('images').each((imageObject) => {
-			if (imageObject.features) {
-				for (const [featureIdx, feature] of imageObject.features.entries()) {
-					if (feature.properties.text.toLowerCase().includes(search.toLowerCase())) {
-						matches.push({ imageObject, feature, featureIdx });
+	const doSearch = debounce((/** @type {string | undefined} */ search) => {
+		if (!search) {
+			matches = undefined;
+			return;
+		}
+		/** @type {FeatureMatch[]} */
+		const newMatches = [];
+		db.table('images')
+			.each((imageObject) => {
+				if (imageObject.features) {
+					for (const [featureIdx, feature] of imageObject.features.entries()) {
+						if (feature.properties.text.toLowerCase().includes(search.toLowerCase())) {
+							newMatches.push({ imageObject, feature, featureIdx });
+						}
 					}
 				}
-			}
-		});
-	});
+			})
+			.then(() => (matches = newMatches));
+	}, 500);
+
+	$effect(() => doSearch(search));
 </script>
 
 <svelte:head>
@@ -39,14 +48,14 @@
 	<div class="search">
 		<Search bind:value={search} />
 		<span>
-			Searching {totalFeatures} features across {totalImages} images{#if matches.length > 0}
-				-- found {matches.length} matches{/if}
+			Searching {totalFeatures.toLocaleString()} features across {totalImages.toLocaleString()} images
+			{#if matches}-- found {matches?.length.toLocaleString()} matches{/if}
 		</span>
 	</div>
 
-	{#if search && matches.length === 0}
+	{#if search && matches && matches.length === 0}
 		<p>No results found for "{search}"</p>
-	{:else}
+	{:else if matches}
 		<ul>
 			{#each matches as match}
 				<li>
