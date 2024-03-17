@@ -1,26 +1,39 @@
 <script>
-	import { panZoom } from '@/lib/actions/pan-zoom';
+	import { tick } from 'svelte';
+	import { panZoom } from '$lib/actions/pan-zoom';
 	import { tooltip } from '$lib/actions/tooltip';
 
 	/**
 	 * @typedef {Object} ViewerProps
 	 * @property {ImageObject} imageObject Image object to view
 	 * @property {string | function} [search] String to search for or callback function to use for marking features
+	 * @property {function} [setMarkedCount] Callback which will be called when the number of matched features is updated
 	 */
 
 	/** @type {ViewerProps} */
-	let { imageObject, search } = $props();
+	let { imageObject, search, setMarkedCount } = $props();
 
 	/** @type {function} */
 	let markFeature = $state(() => false);
 
+	let markedCount = 0;
+
 	$effect(() => {
-		if (typeof search === 'function') {
-			markFeature = search;
-		} else if (typeof search === 'string' && search !== '') {
-			markFeature = (/** @type {FeatureProperty} */ featureProps) =>
-				featureProps.text.toLowerCase().includes(/** @type string */ (search));
+		markedCount = 0;
+		if (!search) {
+			markFeature = () => false;
+			if (setMarkedCount) setMarkedCount(0);
+			return;
 		}
+		markFeature = (/** @type {FeatureProperty} */ featureProps) => {
+			const mark =
+				typeof search === 'function'
+					? search(featureProps)
+					: featureProps.text.toLowerCase().includes(/** @type string */ (search));
+			if (mark) markedCount++;
+			return mark;
+		};
+		if (setMarkedCount) tick().then(() => /** @type {function} */ (setMarkedCount)(markedCount));
 	});
 </script>
 
