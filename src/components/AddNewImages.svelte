@@ -1,4 +1,5 @@
 <script>
+	import { base } from '$app/paths';
 	import { FileUploaderDropContainer } from 'carbon-components-svelte';
 
 	import { upsertImageObject } from '$lib/db';
@@ -33,7 +34,7 @@
 
 				if (redirectOnAdd) {
 					window.location.href =
-						files.length === 1 ? `/view/?id=${newImageObject.id}` : `/dataset/`;
+						files.length === 1 ? `${base}/view/?id=${newImageObject.id}` : `/dataset/`;
 				}
 
 				files = [];
