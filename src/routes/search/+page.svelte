@@ -1,4 +1,5 @@
 <script>
+	import { page } from '$app/stores';
 	import { Search } from 'carbon-components-svelte';
 	import { db } from '$lib/db';
 	import { debounce } from '$lib/debounce';
@@ -14,6 +15,13 @@
 			if (imageObject.features) totalFeatures += imageObject.features.length;
 			totalImages++;
 		});
+	});
+
+	$effect(() => {
+		const searchStr = $page.url.searchParams.get('s');
+		if (searchStr) {
+			search = searchStr;
+		}
 	});
 
 	const doSearch = debounce((/** @type {string | undefined} */ search) => {
