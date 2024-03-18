@@ -3,6 +3,7 @@
 	import { Search } from 'carbon-components-svelte';
 	import { db } from '$lib/db';
 	import { debounce } from '$lib/debounce';
+	import FeatureClip from '@components/FeatureClip.svelte';
 
 	/** @type {FeatureMatch[] | undefined} */
 	let matches = $state();
@@ -29,6 +30,7 @@
 			matches = undefined;
 			return;
 		}
+
 		/** @type {FeatureMatch[]} */
 		const newMatches = [];
 		db.table('images')
@@ -46,7 +48,7 @@
 					}
 				}
 			})
-			.then(() => (matches = newMatches));
+			.then(() => (matches = newMatches.slice(0, 50)));
 	}, 500);
 
 	$effect(() => doSearch(search));
@@ -72,7 +74,8 @@
 		<ul>
 			{#each matches as match (match.key)}
 				<li>
-					{match.imageObject.name} - {match.feature.properties.text}
+					{match.imageObject.name} - ({match.featureIdx}) {match.feature.properties.text}
+					<FeatureClip imageObject={match.imageObject} feature={match.feature} />
 				</li>
 			{/each}
 		</ul>
@@ -99,6 +102,9 @@
 	}
 
 	li {
+		align-items: center;
+		display: flex;
+		gap: 1rem;
 		margin: 0.5rem 0;
 	}
 </style>
