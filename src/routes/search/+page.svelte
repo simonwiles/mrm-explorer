@@ -36,7 +36,12 @@
 				if (imageObject.features) {
 					for (const [featureIdx, feature] of imageObject.features.entries()) {
 						if (feature.properties.text.toLowerCase().includes(search.toLowerCase())) {
-							newMatches.push({ imageObject, feature, featureIdx });
+							newMatches.push({
+								imageObject,
+								feature,
+								featureIdx,
+								key: `${imageObject.id}-${featureIdx}`
+							});
 						}
 					}
 				}
@@ -65,7 +70,7 @@
 		<p>No results found for "{search}"</p>
 	{:else if matches}
 		<ul>
-			{#each matches as match}
+			{#each matches as match (match.key)}
 				<li>
 					{match.imageObject.name} - {match.feature.properties.text}
 				</li>

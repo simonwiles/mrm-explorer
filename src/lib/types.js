@@ -31,4 +31,5 @@
  * @property {ImageObject} imageObject
  * @property {Feature} feature
  * @property {number} featureIdx
+ * @property {string} key
  */
