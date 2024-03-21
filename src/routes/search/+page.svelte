@@ -1,6 +1,6 @@
 <script>
 	import { page } from '$app/stores';
-	import { Button, Search } from 'carbon-components-svelte';
+	import { Button, DataTable, Pagination, Search } from 'carbon-components-svelte';
 	import { db } from '$lib/db';
 	import { debounce } from '$lib/debounce';
 	import ImageProcessingWorker from '$lib/imageProcessingWorker?worker';
@@ -18,6 +18,15 @@
 		// initialize a worker that can be passed to FeatureClip components
 		imageWorker = new ImageProcessingWorker();
 	});
+
+	let pageSize = $state(10);
+	let currentPage = $state(1);
+
+	const dataTableHeaders = [
+		{ key: 'imageName', value: 'Image' },
+		{ key: 'featureText', value: 'Feature Text' },
+		{ key: 'clip', value: 'Clipped Image', sort: false }
+	];
 
 	$effect(() => {
 		db.table('images').each((imageObject) => {
@@ -47,17 +56,24 @@
 				if (imageObject.features) {
 					for (const [featureIdx, feature] of imageObject.features.entries()) {
 						if (feature.properties.text.toLowerCase().includes(search.toLowerCase())) {
+							// newMatches.push({
+							// 	imageObject,
+							// 	feature,
+							// 	featureIdx,
+							// 	id: `${imageObject.id}-${featureIdx}`
+							// });
 							newMatches.push({
+								id: `${imageObject.id}-${featureIdx}`,
+								imageName: imageObject.name,
+								featureText: feature.properties.text,
 								imageObject,
-								feature,
-								featureIdx,
-								key: `${imageObject.id}-${featureIdx}`
+								feature
 							});
 						}
 					}
 				}
 			})
-			.then(() => (matches = newMatches.slice(0, 50)));
+			.then(() => (matches = newMatches));
 	}, 500);
 </script>
 
@@ -81,22 +97,39 @@
 	{#if search && matches && matches.length === 0}
 		<p>No results found for "{search}"</p>
 	{:else if matches && imageWorker}
-		<ul>
+		<!-- <ul>
 			{#each matches as match (match.key)}
 				<li>
 					{match.imageObject.name} - ({match.featureIdx}) {match.feature.properties.text}
 					<FeatureClip imageObject={match.imageObject} feature={match.feature} {imageWorker} />
 				</li>
 			{/each}
-		</ul>
+		</ul> -->
+		<DataTable headers={dataTableHeaders} rows={matches} sortable {pageSize} page={currentPage}>
+			<svelte:fragment slot="cell" let:row let:cell>
+				{#if cell.key === 'clip'}
+					<FeatureClip imageObject={row.imageObject} feature={row.feature} {imageWorker} />
+				{:else}
+					{cell.value}
+				{/if}
+			</svelte:fragment>
+		</DataTable>
+
+		<Pagination
+			bind:pageSize
+			bind:page={currentPage}
+			totalItems={matches.length}
+			pageSizeInputDisabled
+		/>
 	{/if}
 </div>
 
 <style>
 	.container {
-		height: 100%;
 		display: flex;
 		flex-direction: column;
+		gap: 1rem;
+		height: 100%;
 	}
 
 	.search {
