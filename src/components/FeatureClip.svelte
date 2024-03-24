@@ -9,7 +9,7 @@
 	 */
 
 	/** @type {FeatureClipProps} */
-	let { imageObject, feature } = $props();
+	let { imageObject, feature, wipWorker } = $props();
 
 	let croppedImageBlob = $state();
 
@@ -33,29 +33,48 @@
 
 		console.log(rect, height, width);
 
-		const img = new Image();
-		img.onload = () => {
-			// Note: using img.decode here was resulting in a weird race-condition-like error
-			//       whereby only one image (non-determinate) was decoding properly.
-			//       Using img.onload seems to work okay, though? 🤷
-			const canvas = document.createElement('canvas');
-			const ctx = canvas.getContext('2d');
-			canvas.width = width;
-			canvas.height = height;
+		// const img = new Image();
+		// img.onload = () => {
+		// 	// Note: using img.decode here was resulting in a weird race-condition-like error
+		// 	//       whereby only one image (non-determinate) was decoding properly.
+		// 	//       Using img.onload seems to work okay, though? 🤷
+		// 	const canvas = document.createElement('canvas');
+		// 	const ctx = canvas.getContext('2d');
+		// 	canvas.width = width;
+		// 	canvas.height = height;
 
-			ctx?.drawImage(img, rect[0], rect[1], width, height, 0, 0, width, height);
-			canvas.toBlob((blob) => {
-				croppedImageBlob = blob;
-			});
+		// 	ctx?.drawImage(img, rect[0], rect[1], width, height, 0, 0, width, height);
+		// 	canvas.toBlob((blob) => {
+		// 		croppedImageBlob = blob;
+		// 	});
+
+		// };
+
+		// tick().then(() => (img.src = URL.createObjectURL(imageObject.imageBlob)));
+
+		const channel = new MessageChannel();
+
+		channel.port2.onmessage = async function (event) {
+			console.log('gotmsg', event.data);
+			// URL.revokeObjectURL(img_dom.src);
+			croppedImageBlob = event.data;
 		};
 
-		tick().then(() => (img.src = URL.createObjectURL(imageObject.imageBlob)));
+		const msg = {
+			imageBlob: imageObject.imageBlob,
+			x: rect[0],
+			y: rect[1],
+			w: width,
+			h: height
+		};
+
+		wipWorker.postMessage(msg, [channel.port1]);
 	});
 </script>
 
 {#if croppedImageBlob}
 	<img
-		src={URL.createObjectURL(croppedImageBlob)}
+		src={croppedImageBlob}
 		alt={`"${feature.properties.text}" (${imageObject.name})`}
 		loading="lazy"
 	/>

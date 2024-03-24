@@ -3,6 +3,7 @@
 	import { Search } from 'carbon-components-svelte';
 	import { db } from '$lib/db';
 	import { debounce } from '$lib/debounce';
+	import WIPWorker from '$lib/wasm-image-processing/worker?worker';
 	import FeatureClip from '@components/FeatureClip.svelte';
 
 	/** @type {FeatureMatch[] | undefined} */
@@ -10,6 +11,11 @@
 	let search = $state();
 	let totalImages = $state(0);
 	let totalFeatures = $state(0);
+	let wipWorker;
+
+	$effect(() => {
+		wipWorker = new WIPWorker();
+	});
 
 	$effect(() => {
 		db.table('images').each((imageObject) => {
@@ -75,7 +81,7 @@
 			{#each matches as match (match.key)}
 				<li>
 					{match.imageObject.name} - ({match.featureIdx}) {match.feature.properties.text}
-					<FeatureClip imageObject={match.imageObject} feature={match.feature} />
+					<FeatureClip imageObject={match.imageObject} feature={match.feature} {wipWorker} />
 				</li>
 			{/each}
 		</ul>
