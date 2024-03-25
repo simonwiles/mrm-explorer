@@ -1,17 +1,19 @@
 <script>
-	import { tick, unstate } from 'svelte';
+	import { unstate } from 'svelte';
 	import { Loading } from 'carbon-components-svelte';
 
 	/**
 	 * @typedef {Object} FeatureClipProps
 	 * @property {ImageObject} imageObject Image object to view
 	 * @property {Feature} feature Feature to clip
+	 * @property {Worker} imageWorker Worker to use for image processing
 	 */
 
 	/** @type {FeatureClipProps} */
-	let { imageObject, feature } = $props();
+	let { imageObject, feature, imageWorker } = $props();
 
-	let croppedImageBlob = $state();
+	let canvas = $state();
+	let canvasReady = $state(false);
 
 	/** @param {number[][]} coordinates */
 	const getRectangle = (coordinates) => {
@@ -31,37 +33,30 @@
 		const height = rect[3] - rect[1];
 		const width = rect[2] - rect[0];
 
-		console.log(rect, height, width);
+		const channel = new MessageChannel();
 
-		const img = new Image();
-		img.onload = () => {
-			// Note: using img.decode here was resulting in a weird race-condition-like error
-			//       whereby only one image (non-determinate) was decoding properly.
-			//       Using img.onload seems to work okay, though? 🤷
-			const canvas = document.createElement('canvas');
-			const ctx = canvas.getContext('2d');
-			canvas.width = width;
-			canvas.height = height;
-
-			ctx?.drawImage(img, rect[0], rect[1], width, height, 0, 0, width, height);
-			canvas.toBlob((blob) => {
-				croppedImageBlob = blob;
-			});
+		channel.port2.onmessage = async function (event) {
+			if (event.data === 'success') canvasReady = true;
 		};
 
-		tick().then(() => (img.src = URL.createObjectURL(imageObject.imageBlob)));
+		const offscreen = canvas.transferControlToOffscreen();
+		const msg = {
+			imageBlob: imageObject.imageBlob,
+			x: rect[0],
+			y: rect[1],
+			w: width,
+			h: height,
+			canvas: offscreen
+		};
+
+		imageWorker.postMessage(msg, [offscreen, channel.port1]);
 	});
 </script>
 
-{#if croppedImageBlob}
-	<img
-		src={URL.createObjectURL(croppedImageBlob)}
-		alt={`"${feature.properties.text}" (${imageObject.name})`}
-		loading="lazy"
-	/>
-{:else}
+{#if !canvasReady}
 	<Loading withOverlay={false} small />
 {/if}
+<canvas bind:this={canvas} style.display={canvasReady ? 'block' : 'none'} />
 
 <style>
 	img {
