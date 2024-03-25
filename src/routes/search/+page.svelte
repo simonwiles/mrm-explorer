@@ -3,6 +3,7 @@
 	import { Button, Search } from 'carbon-components-svelte';
 	import { db } from '$lib/db';
 	import { debounce } from '$lib/debounce';
+	import ImageProcessingWorker from '$lib/imageProcessingWorker?worker';
 	import FeatureClip from '@components/FeatureClip.svelte';
 
 	/** @type {FeatureMatch[] | undefined} */
@@ -10,6 +11,13 @@
 	let search = $state();
 	let totalImages = $state(0);
 	let totalFeatures = $state(0);
+	/** @type {Worker | undefined} */
+	let imageWorker = $state();
+
+	$effect(() => {
+		// initialize a worker that can be passed to FeatureClip components
+		imageWorker = new ImageProcessingWorker();
+	});
 
 	$effect(() => {
 		db.table('images').each((imageObject) => {
@@ -72,12 +80,12 @@
 
 	{#if search && matches && matches.length === 0}
 		<p>No results found for "{search}"</p>
-	{:else if matches}
+	{:else if matches && imageWorker}
 		<ul>
 			{#each matches as match (match.key)}
 				<li>
 					{match.imageObject.name} - ({match.featureIdx}) {match.feature.properties.text}
-					<FeatureClip imageObject={match.imageObject} feature={match.feature} />
+					<FeatureClip imageObject={match.imageObject} feature={match.feature} {imageWorker} />
 				</li>
 			{/each}
 		</ul>
