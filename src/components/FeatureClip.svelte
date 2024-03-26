@@ -27,7 +27,6 @@
 
 	$effect(() => {
 		if (!imageObject || !feature) return;
-
 		const vertices = feature.geometry.coordinates[0].map(([x, y]) => [x, 1 - y]);
 		const rect = getRectangle(unstate(vertices));
 		const height = rect[3] - rect[1];
@@ -37,11 +36,12 @@
 
 		channel.port2.onmessage = async function (event) {
 			if (event.data === 'success') canvasReady = true;
+			console.log(performance.now());
 		};
 
 		const offscreen = canvas.transferControlToOffscreen();
 		const msg = {
-			imageBlob: imageObject.imageBlob,
+			id: imageObject.id,
 			x: rect[0],
 			y: rect[1],
 			w: width,
