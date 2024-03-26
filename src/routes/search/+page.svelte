@@ -1,6 +1,6 @@
 <script>
 	import { page } from '$app/stores';
-	import { Search } from 'carbon-components-svelte';
+	import { Button, Search } from 'carbon-components-svelte';
 	import { db } from '$lib/db';
 	import { debounce } from '$lib/debounce';
 	import FeatureClip from '@components/FeatureClip.svelte';
@@ -22,6 +22,7 @@
 		const searchStr = $page.url.searchParams.get('s');
 		if (searchStr) {
 			search = searchStr;
+			doSearch(search);
 		}
 	});
 
@@ -50,8 +51,6 @@
 			})
 			.then(() => (matches = newMatches.slice(0, 50)));
 	}, 500);
-
-	$effect(() => doSearch(search));
 </script>
 
 <svelte:head>
@@ -61,7 +60,10 @@
 
 <div class="container">
 	<div class="search">
-		<Search bind:value={search} />
+		<div class="search-input">
+			<Button on:click={() => doSearch(search)}>Search</Button>
+			<Search bind:value={search} />
+		</div>
 		<span>
 			Searching {totalFeatures.toLocaleString()} features across {totalImages.toLocaleString()} images
 			{#if matches}-- found {matches?.length.toLocaleString()} matches{/if}
@@ -93,6 +95,10 @@
 		display: flex;
 		flex-direction: column;
 		gap: 1rem;
+	}
+
+	.search-input {
+		display: flex;
 	}
 
 	ul {
