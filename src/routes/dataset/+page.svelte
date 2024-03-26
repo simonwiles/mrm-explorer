@@ -34,7 +34,7 @@
 		{ key: 'features', value: '# Features' },
 		{ key: 'size', value: 'Image Size' },
 		{ key: 'bytes', value: 'Size in Database' },
-		{ key: 'imageBlob', value: 'Image' },
+		{ key: 'imageThumbBlob', value: 'Image' },
 		{ key: 'actions', empty: true }
 	];
 
@@ -108,7 +108,7 @@
 				{/if}
 			</svelte:fragment>
 			<svelte:fragment slot="cell" let:row let:cell>
-				{#if cell.key === 'imageBlob'}
+				{#if cell.key === 'imageThumbBlob'}
 					<img src={URL.createObjectURL(cell.value)} alt={row.name} height="80px" />
 				{:else if cell.key === 'features'}
 					{#if cell.value}
