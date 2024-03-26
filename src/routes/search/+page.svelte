@@ -62,7 +62,12 @@
 	<div class="search">
 		<div class="search-input">
 			<Button on:click={() => doSearch(search)}>Search</Button>
-			<Search bind:value={search} />
+			<Search
+				bind:value={search}
+				on:keyup={(event) => {
+					if (event.key === 'Enter') doSearch(search);
+				}}
+			/>
 		</div>
 		<span>
 			Searching {totalFeatures.toLocaleString()} features across {totalImages.toLocaleString()} images
