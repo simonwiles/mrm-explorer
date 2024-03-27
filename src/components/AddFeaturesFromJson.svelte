@@ -1,7 +1,8 @@
 <script>
-	import { tick, unstate } from 'svelte';
+	import { unstate } from 'svelte';
 	import { FileUploaderDropContainer } from 'carbon-components-svelte';
 	import { upsertImageObject } from '$lib/db';
+	import FeatureClipWorker from '$lib/featureClipWorker?worker';
 
 	/** @type {{imageObject: ImageObject}} */
 	let { imageObject } = $props();
@@ -10,10 +11,20 @@
 	 * @param {{features: Array<Feature>}} mrmGeoJson
 	 */
 	async function addFeaturesToImage(mrmGeoJson) {
-		imageObject.features = mrmGeoJson.features;
-		await tick();
-		// createFeaturePaths(mrmGeoJson.features);
-		upsertImageObject(unstate(imageObject));
+		// imageObject.features = mrmGeoJson.features;
+		// await upsertImageObject(unstate(imageObject));
+		const featureClipWorker = new FeatureClipWorker();
+		featureClipWorker.postMessage({
+			imageId: imageObject.id,
+			features: mrmGeoJson.features
+		});
+		featureClipWorker.onmessage = (e) => {
+			console.log('returned', e);
+			// if (!e.data) return;
+			// const { imageObject: updatedImageObject } = e.data;
+			// imageObject = updatedImageObject;
+			// upsertImageObject(unstate(imageObject));
+		};
 	}
 </script>
 

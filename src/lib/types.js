@@ -28,9 +28,19 @@
  * @property {number} score
  */
 
-/** @typedef {Object} FeatureMatch
+/**
+ * @typedef {Object} FeatureMatch
  * @property {ImageObject} imageObject
  * @property {Feature} feature
  * @property {number} featureIdx
  * @property {string} key
+ */
+
+/**
+ * @typedef {Object} FeatureObject
+ * @property {number} imageId
+ * @property {number} featureId
+ * @property {string} text
+ * @property {number} score
+ * @property {Blob} featureImage
  */

@@ -3,7 +3,8 @@ import Dexie, { liveQuery } from 'dexie';
 
 export const db = new Dexie('mrmExplorer');
 db.version(1).stores({
-	images: '++id, name'
+	images: '++id, name',
+	features: '[featureId+imageId], text'
 });
 
 /**
@@ -90,4 +91,17 @@ export const removeImageObjectById = async (id) => {
  */
 export const removeAllImageObjects = async () => {
 	await db.table('images').clear();
+};
+
+/**
+ * Insert a feature in the database
+ * @param {FeatureObject} feature
+ */
+export const insertFeature = async (feature) => {
+	try {
+		console.log(feature);
+		await db.table('features').add(feature);
+	} catch (error) {
+		console.error(`Failed to upsert ${feature}: ${error}`);
+	}
 };
