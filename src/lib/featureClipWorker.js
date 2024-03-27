@@ -1,18 +1,18 @@
 import { fetchImageObjectById, insertFeature } from './db';
 
-async function clipFeature({ imageBitmap, x, y, w, h }) {
-	let canvas = new OffscreenCanvas(w, h);
-	const ctx = canvas.getContext('2d');
-	// createImageBitmap(imageBlob).then((imageBitmap) => {
-	// 	ctx.drawImage(imageBitmap, x, y, w, h, 0, 0, w, h);
-	// 	port.postMessage('success');
-	// });
+// async function clipFeature({ imageBitmap, x, y, w, h }) {
+// 	let canvas = new OffscreenCanvas(w, h);
+// 	const ctx = canvas.getContext('bitmaprenderer');
+// 	// createImageBitmap(imageBlob).then((imageBitmap) => {
+// 	// 	ctx.drawImage(imageBitmap, x, y, w, h, 0, 0, w, h);
+// 	// 	port.postMessage('success');
+// 	// });
 
-	ctx?.drawImage(imageBitmap, x, y, w, h, 0, 0, w, h);
-	const blob = await canvas.convertToBlob();
-	canvas = undefined;
-	return blob;
-}
+// 	ctx?.drawImage(imageBitmap, x, y, w, h, 0, 0, w, h);
+// 	const blob = await canvas.convertToBlob();
+// 	canvas = undefined;
+// 	return blob;
+// }
 
 const getRectangle = (coordinates) => {
 	return [
@@ -29,16 +29,16 @@ onmessage = async function (event) {
 	// const port = event.ports[0];
 
 	const imageObject = await fetchImageObjectById(imageId);
-	// const imageBitmap = await createImageBitmap(imageObject.imageBlob);
+	const imageBitmap = await createImageBitmap(imageObject.imageBlob);
 	for (const [featureId, feature] of features.entries()) {
 		const [x, y, w, h] = getRectangle(feature.geometry.coordinates[0].map(([x, y]) => [x, 1 - y]));
 		console.log(performance.now(), featureId, feature.properties.text, [x, y, w, h]);
-		const imageBitmap = await createImageBitmap(imageObject.imageBlob, x, y, w, h);
+		const croppedBitmap = await createImageBitmap(imageBitmap, x, y, w, h);
 		let canvas = new OffscreenCanvas(w, h);
 		const ctx = canvas.getContext('bitmaprenderer');
-		ctx.transferFromImageBitmap(imageBitmap);
+		ctx.transferFromImageBitmap(croppedBitmap);
 		const featureImage = await canvas.convertToBlob();
-		imageBitmap.close();
+		croppedBitmap.close();
 
 		insertFeature({
 			imageId,
@@ -49,6 +49,7 @@ onmessage = async function (event) {
 			// featureImage: await clipFeature({ imageBitmap, x, y, w, h })
 		});
 	}
+	imageBitmap.close();
 };
 
 //  const canvas = new OffscreenCanvas(w, h);
