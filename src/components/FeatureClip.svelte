@@ -33,23 +33,26 @@
 		const height = rect[3] - rect[1];
 		const width = rect[2] - rect[0];
 
-		const channel = new MessageChannel();
+		canvas.width = width;
+		canvas.height = height;
+		const offscreen = canvas.transferControlToOffscreen();
 
+		const channel = new MessageChannel();
 		channel.port2.onmessage = async function (event) {
 			if (event.data === 'success') canvasReady = true;
 		};
 
-		const offscreen = canvas.transferControlToOffscreen();
-		const msg = {
-			imageBlob: imageObject.imageBlob,
-			x: rect[0],
-			y: rect[1],
-			w: width,
-			h: height,
-			canvas: offscreen
-		};
-
-		imageWorker.postMessage(msg, [offscreen, channel.port1]);
+		createImageBitmap(imageObject.imageBlob).then((imageBitmap) => {
+			const msg = {
+				imageBitmap,
+				canvas: offscreen,
+				x: rect[0],
+				y: rect[1],
+				w: width,
+				h: height
+			};
+			imageWorker.postMessage(msg, [offscreen, channel.port1, imageBitmap]);
+		});
 	});
 </script>
 
