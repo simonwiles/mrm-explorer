@@ -12,6 +12,12 @@
     * Coordinates are extracted from the SVG selector.  If the selector is not of type
       "SvgSelector", it is skipped.  (I've only seen one such example so far, where one
       feature was type = "FragmentSelector" -- may be worth looking into at some point.)
+    
+    * the `convert` command's `--scale-resolution` option takes a value of the form
+      `<orig_width>x<orig_height>-<target_width>x<target_height>`, where the `orig` values
+      are the dimensions of the original image to which the coordinates in the JSON file
+      correlate, and the `target` values are the dimensions of the actual version of the
+      image that will be used.
 
     ---
 """
@@ -37,7 +43,7 @@ cli = typer.Typer(
 )
 
 
-def extract_coordinates(item):
+def extract_coordinates(item, scale_factor=None):
     """Extract coordinates from the item."""
     svg_string = item["target"]["selector"]["value"]
     assert 'transform="scale(1.0 1.0)"' in svg_string
@@ -45,10 +51,14 @@ def extract_coordinates(item):
     if polygon is None:
         raise ValueError(svg_string)
     points = [_.split(",") for _ in polygon.group(1).split(" ")]
+
+    if scale_factor is not None:
+        return [[float(x) * scale_factor, -float(y) * scale_factor] for x, y in points]
+
     return [[float(x), -float(y)] for x, y in points]
 
 
-def parse_features_from_luna_json(input_file):
+def parse_features_from_luna_json(input_file, scale_factor=None):
     """Parse Luna JSON files."""
 
     features = []
@@ -66,7 +76,7 @@ def parse_features_from_luna_json(input_file):
                 "type": "Feature",
                 "geometry": {
                     "type": "Polygon",
-                    "coordinates": [extract_coordinates(item)],
+                    "coordinates": [extract_coordinates(item, scale_factor)],
                 },
                 "properties": {
                     "text": item["body"][0]["value"],
@@ -107,13 +117,24 @@ def convert(
         typer.Argument(help="Input file (accepts multiple files, globs, etc.)"),
     ],
     output_file: str = typer.Option(None, "--output", "-o", help="Output file"),
+    scale_resolution: str = typer.Option(None, "--scale-resolution"),
 ):
+
+    scale_factor = None
+    if scale_resolution is not None:
+        [orig_res, target_res] = scale_resolution.split("-")
+        [orig_h, orig_w] = orig_res.split("x")
+        [target_h, target_w] = target_res.split("x")
+        assert float(orig_h) / float(orig_w) == float(target_h) / float(
+            target_w
+        ), "Invalid scale resolution"
+        scale_factor = float(target_w) / float(orig_w)
 
     features = [
         feature
         for path_expr in input_files
         for luna_json_file in Path(path_expr.root).glob(str(path_expr))
-        for feature in parse_features_from_luna_json(luna_json_file)
+        for feature in parse_features_from_luna_json(luna_json_file, scale_factor)
     ]
 
     mrm_style_geojson = {"type": "FeatureCollection", "features": features}
