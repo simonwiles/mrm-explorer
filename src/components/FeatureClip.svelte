@@ -59,12 +59,15 @@
 {#if !canvasReady}
 	<Loading withOverlay={false} small />
 {/if}
-<canvas bind:this={canvas} style.display={canvasReady ? 'block' : 'none'} />
+<canvas bind:this={canvas} class:loaded={canvasReady} />
 
 <style>
-	img {
-		max-height: 100%;
-		max-width: 100%;
-		height: 40px;
+	canvas {
+		scale: 0;
+		transition: scale 0.3s ease-in-out;
+
+		&.loaded {
+			scale: 1;
+		}
 	}
 </style>
