@@ -6,13 +6,15 @@
 	import ImageProcessingWorker from '$lib/imageProcessingWorker?worker';
 	import FeatureClip from '@components/FeatureClip.svelte';
 
-	/** @type {FeatureMatch[] | undefined} */
-	let matches = $state();
+	/** @type {FeatureMatch[]} */
+	let matches = $state([]);
+	let totalMatches = $state(0);
 	let search = $state();
 	let totalImages = $state(0);
 	let totalFeatures = $state(0);
 	/** @type {Worker | undefined} */
 	let imageWorker = $state();
+	let maxResults = $state(10);
 
 	$effect(() => {
 		// initialize a worker that can be passed to FeatureClip components
@@ -35,29 +37,30 @@
 	});
 
 	const doSearch = debounce((/** @type {string | undefined} */ search) => {
+		matches = [];
+		totalMatches = 0;
+
 		if (!search) {
-			matches = undefined;
 			return;
 		}
 
 		/** @type {FeatureMatch[]} */
-		const newMatches = [];
-		db.table('images')
-			.each((imageObject) => {
-				if (imageObject.features) {
-					for (const [featureIdx, feature] of imageObject.features.entries()) {
-						if (feature.properties.text.toLowerCase().includes(search.toLowerCase())) {
-							newMatches.push({
-								imageObject,
-								feature,
-								featureIdx,
-								key: `${imageObject.id}-${featureIdx}`
-							});
-						}
+		db.table('images').each((imageObject) => {
+			if (imageObject.features) {
+				for (const [featureIdx, feature] of imageObject.features.entries()) {
+					if (feature.properties.text.toLowerCase().includes(search.toLowerCase())) {
+						totalMatches++;
+						if (matches.length >= maxResults) continue;
+						matches.push({
+							imageObject,
+							feature,
+							featureIdx,
+							key: `${imageObject.id}-${featureIdx}`
+						});
 					}
 				}
-			})
-			.then(() => (matches = newMatches.slice(0, 50)));
+			}
+		});
 	}, 500);
 </script>
 
@@ -79,7 +82,7 @@
 		</div>
 		<span>
 			Searching {totalFeatures.toLocaleString()} features across {totalImages.toLocaleString()} images
-			{#if matches}-- found {matches?.length.toLocaleString()} matches{/if}
+			{#if totalMatches}-- found {totalMatches.toLocaleString()} matches{/if}
 		</span>
 	</div>
 
