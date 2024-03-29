@@ -10,7 +10,7 @@
 	 */
 
 	/** @type {FeatureClipProps} */
-	let { imageObject, feature, imageWorker } = $props();
+	let { imageBlob, feature, imageWorker } = $props();
 
 	let canvas = $state();
 	let canvasReady = $state(false);
@@ -26,7 +26,7 @@
 	};
 
 	$effect(() => {
-		if (!imageObject || !feature) return;
+		if (!imageBlob || !feature) return;
 
 		const vertices = feature.geometry.coordinates[0].map(([x, y]) => [x, 1 - y]);
 		const rect = getRectangle(unstate(vertices));
@@ -42,17 +42,19 @@
 			if (event.data === 'success') canvasReady = true;
 		};
 
-		createImageBitmap(imageObject.imageBlob).then((imageBitmap) => {
-			const msg = {
-				imageBitmap,
-				canvas: offscreen,
-				x: rect[0],
-				y: rect[1],
-				w: width,
-				h: height
-			};
-			imageWorker.postMessage(msg, [offscreen, channel.port1, imageBitmap]);
-		});
+		imageBlob.then((imageBlob) =>
+			createImageBitmap(imageBlob).then((imageBitmap) => {
+				const msg = {
+					imageBitmap,
+					canvas: offscreen,
+					x: rect[0],
+					y: rect[1],
+					w: width,
+					h: height
+				};
+				imageWorker.postMessage(msg, [offscreen, channel.port1, imageBitmap]);
+			})
+		);
 	});
 </script>
 

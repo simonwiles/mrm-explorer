@@ -8,13 +8,16 @@
 
 	/** @type {FeatureMatch[]} */
 	let matches = $state([]);
-	let totalMatches = $state(0);
+	/** @type {FeatureMatch[]} */
+	let rows = $state([]);
 	let search = $state();
 	let totalImages = $state(0);
 	let totalFeatures = $state(0);
 	/** @type {Worker | undefined} */
 	let imageWorker = $state();
 	let maxResults = $state(10);
+
+	let imageBlobs = $state(new Map());
 
 	$effect(() => {
 		// initialize a worker that can be passed to FeatureClip components
@@ -38,29 +41,42 @@
 
 	const doSearch = debounce((/** @type {string | undefined} */ search) => {
 		matches = [];
-		totalMatches = 0;
-
+		rows = [];
 		if (!search) {
 			return;
 		}
 
 		/** @type {FeatureMatch[]} */
-		db.table('images').each((imageObject) => {
-			if (imageObject.features) {
-				for (const [featureIdx, feature] of imageObject.features.entries()) {
-					if (feature.properties.text.toLowerCase().includes(search.toLowerCase())) {
-						totalMatches++;
-						if (matches.length >= maxResults) continue;
-						matches.push({
-							imageObject,
-							feature,
-							featureIdx,
-							key: `${imageObject.id}-${featureIdx}`
-						});
+		db.table('images')
+			.each((imageObject) => {
+				if (imageObject.features) {
+					for (const [featureId, feature] of imageObject.features.entries()) {
+						if (feature.properties.text.toLowerCase().includes(search.toLowerCase())) {
+							matches.push({
+								imageId: imageObject.id,
+								imageName: imageObject.name,
+								feature,
+								featureId,
+								key: `${imageObject.id}-${featureId}`
+							});
+						}
 					}
 				}
-			}
-		});
+			})
+			.then(() => {
+				rows = matches.slice(0, maxResults);
+				rows.forEach((row) => {
+					if (!imageBlobs.has(row.imageId)) {
+						imageBlobs.set(
+							row.imageId,
+							db
+								.table('images')
+								.get(row.imageId)
+								.then((imageObject) => imageObject.imageBlob)
+						);
+					}
+				});
+			});
 	}, 500);
 </script>
 
@@ -82,18 +98,22 @@
 		</div>
 		<span>
 			Searching {totalFeatures.toLocaleString()} features across {totalImages.toLocaleString()} images
-			{#if totalMatches}-- found {totalMatches.toLocaleString()} matches{/if}
+			{#if matches}-- found {matches?.length.toLocaleString()} matches{/if}
 		</span>
 	</div>
 
 	{#if search && matches && matches.length === 0}
 		<p>No results found for "{search}"</p>
-	{:else if matches && imageWorker}
+	{:else if rows && imageWorker}
 		<ul>
-			{#each matches as match (match.key)}
+			{#each rows as match (match.key)}
 				<li>
-					{match.imageObject.name} - ({match.featureIdx}) {match.feature.properties.text}
-					<FeatureClip imageObject={match.imageObject} feature={match.feature} {imageWorker} />
+					{match.imageName} - ({match.featureId}) {match.feature.properties.text}
+					<FeatureClip
+						imageBlob={imageBlobs.get(match.imageId)}
+						feature={match.feature}
+						{imageWorker}
+					/>
 				</li>
 			{/each}
 		</ul>
