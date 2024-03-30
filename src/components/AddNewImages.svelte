@@ -53,6 +53,7 @@
 					height: img.naturalHeight,
 					imageThumbBlob
 				});
+				imageWorker.terminate();
 			};
 
 			imageWorker.postMessage(
