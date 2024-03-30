@@ -1,15 +1,43 @@
 <script>
+	import { unstate } from 'svelte';
 	import { page } from '$app/stores';
 	import { Button, Search } from 'carbon-components-svelte';
 	import { db } from '$lib/db';
 	import { debounce } from '$lib/debounce';
 	import FeatureClip from '@components/FeatureClip.svelte';
 
-	/** @type {FeatureMatch[] | undefined} */
-	let matches = $state();
+	/** @type {FeatureMatch[]} */
+	let matches = $state([]);
+	let totalMatches = $state(0);
 	let search = $state();
 	let totalImages = $state(0);
 	let totalFeatures = $state(0);
+	let maxResults = $state(100);
+
+	let imageBitmaps = new Map();
+
+	/** @param {number[][]} coordinates */
+	const getRectangle = (coordinates) => {
+		return [
+			Math.min(...coordinates.map(([x]) => x)),
+			Math.min(...coordinates.map(([, y]) => y)),
+			Math.max(...coordinates.map(([x]) => x)),
+			Math.max(...coordinates.map(([, y]) => y))
+		];
+	};
+
+	/**
+	 * @param {ImageBitmap} imageBitmap
+	 * @param {Feature} feature
+	 */
+	const getClip = (imageBitmap, feature) => {
+		const vertices = feature.geometry.coordinates[0].map(([x, y]) => [x, 1 - y]);
+		const rect = getRectangle(unstate(vertices));
+		const height = rect[3] - rect[1];
+		const width = rect[2] - rect[0];
+		const croppedBitmap = createImageBitmap(imageBitmap, rect[0], rect[1], width, height);
+		return { croppedBitmap, width, height };
+	};
 
 	$effect(() => {
 		db.table('images').each((imageObject) => {
@@ -26,30 +54,42 @@
 		}
 	});
 
-	const doSearch = debounce((/** @type {string | undefined} */ search) => {
+	const doSearch = debounce(async (/** @type {string | undefined} */ search) => {
+		matches = [];
+		totalMatches = 0;
+
 		if (!search) {
-			matches = undefined;
 			return;
 		}
 
-		/** @type {FeatureMatch[]} */
-		const newMatches = [];
-		db.table('images')
-			.each((imageObject) => {
-				if (imageObject.features) {
-					for (const [featureIdx, feature] of imageObject.features.entries()) {
-						if (feature.properties.text.toLowerCase().includes(search.toLowerCase())) {
-							newMatches.push({
-								imageObject,
-								feature,
-								featureIdx,
-								key: `${imageObject.id}-${featureIdx}`
-							});
+		db.table('images').each(async (imageObject) => {
+			if (imageObject.features) {
+				for (const [featureId, feature] of imageObject.features.entries()) {
+					if (feature.properties.text.toLowerCase().includes(search.toLowerCase())) {
+						totalMatches++;
+						if (matches.length >= maxResults) continue;
+						if (!imageBitmaps.has(imageObject.id)) {
+							imageBitmaps.set(imageObject.id, await createImageBitmap(imageObject.imageBlob));
 						}
+						const { croppedBitmap, width, height } = getClip(
+							imageBitmaps.get(imageObject.id),
+							feature
+						);
+						matches.push({
+							key: `${imageObject.id}-${featureId}`,
+							imageName: imageObject.name,
+							featureId,
+							text: feature.properties.text,
+							width,
+							height,
+							croppedBitmap
+						});
 					}
 				}
-			})
-			.then(() => (matches = newMatches.slice(0, 50)));
+			}
+			imageBitmaps.forEach((bitmap) => bitmap.close());
+			imageBitmaps.clear();
+		});
 	}, 500);
 </script>
 
@@ -71,7 +111,7 @@
 		</div>
 		<span>
 			Searching {totalFeatures.toLocaleString()} features across {totalImages.toLocaleString()} images
-			{#if matches}-- found {matches?.length.toLocaleString()} matches{/if}
+			{#if totalMatches}-- found {totalMatches.toLocaleString()} matches{/if}
 		</span>
 	</div>
 
@@ -81,8 +121,12 @@
 		<ul>
 			{#each matches as match (match.key)}
 				<li>
-					{match.imageObject.name} - ({match.featureIdx}) {match.feature.properties.text}
-					<FeatureClip imageObject={match.imageObject} feature={match.feature} />
+					{match.imageName} - ({match.featureId}) {match.text}
+					<FeatureClip
+						croppedBitmap={match.croppedBitmap}
+						width={match.width}
+						height={match.height}
+					/>
 				</li>
 			{/each}
 		</ul>

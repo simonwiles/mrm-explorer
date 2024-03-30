@@ -29,8 +29,11 @@
  */
 
 /** @typedef {Object} FeatureMatch
- * @property {ImageObject} imageObject
- * @property {Feature} feature
- * @property {number} featureIdx
  * @property {string} key
+ * @property {string} imageName
+ * @property {number} featureId
+ * @property {string} text
+ * @property {number} width
+ * @property {number} height
+ * @property {Promise<ImageBitmap>} croppedBitmap
  */
