@@ -1,7 +1,7 @@
 <script>
 	import { unstate } from 'svelte';
 	import { page } from '$app/stores';
-	import { InlineLoading, Search } from 'carbon-components-svelte';
+	import { DataTable, InlineLoading, Search } from 'carbon-components-svelte';
 	import { db } from '$lib/db';
 	import { debounce } from '$lib/debounce';
 	import FeatureClip from '@components/FeatureClip.svelte';
@@ -12,6 +12,12 @@
 	let search = $state();
 	let totalImages = $state(0);
 	let totalFeatures = $state(0);
+
+	const dataTableHeaders = [
+		{ key: 'imageName', value: 'Image' },
+		{ key: 'text', value: 'Feature Text' },
+		{ key: 'clip', value: 'Clipped Image', sort: false }
+	];
 
 	/** @param {number[][]} coordinates */
 	const getRectangle = (coordinates) => {
@@ -62,7 +68,7 @@
 					}
 					const { croppedBitmap, width, height } = getClip(imageBitmap, feature);
 					matches.push({
-						key: `${imageObject.id}-${featureId}`,
+						id: `${imageObject.id}-${featureId}`,
 						imageName: imageObject.name,
 						featureId,
 						text: feature.properties.text,
@@ -122,7 +128,17 @@
 		</div>
 	</div>
 
-	{#if matches}
+	<DataTable headers={dataTableHeaders} rows={matches} sortable>
+		<svelte:fragment slot="cell" let:row let:cell>
+			{#if cell.key === 'clip'}
+				<FeatureClip croppedBitmap={row.croppedBitmap} width={row.width} height={row.height} />
+			{:else}
+				{cell.value}
+			{/if}
+		</svelte:fragment>
+	</DataTable>
+
+	<!-- {#if matches}
 		<ul>
 			{#each matches as match (match.key)}
 				<li>
@@ -135,7 +151,7 @@
 				</li>
 			{/each}
 		</ul>
-	{/if}
+	{/if} -->
 </div>
 
 <style>
