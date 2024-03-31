@@ -1,20 +1,17 @@
 <script>
 	import { unstate } from 'svelte';
 	import { page } from '$app/stores';
-	import { Button, Search } from 'carbon-components-svelte';
+	import { InlineLoading, Search } from 'carbon-components-svelte';
 	import { db } from '$lib/db';
 	import { debounce } from '$lib/debounce';
 	import FeatureClip from '@components/FeatureClip.svelte';
 
 	/** @type {FeatureMatch[]} */
 	let matches = $state([]);
-	let totalMatches = $state(0);
+	let searching = $state(false);
 	let search = $state();
 	let totalImages = $state(0);
 	let totalFeatures = $state(0);
-	let maxResults = $state(100);
-
-	let imageBitmaps = new Map();
 
 	/** @param {number[][]} coordinates */
 	const getRectangle = (coordinates) => {
@@ -54,43 +51,51 @@
 		}
 	});
 
-	const doSearch = debounce(async (/** @type {string | undefined} */ search) => {
-		matches = [];
-		totalMatches = 0;
-
-		if (!search) {
-			return;
-		}
-
-		db.table('images').each(async (imageObject) => {
-			if (imageObject.features) {
-				for (const [featureId, feature] of imageObject.features.entries()) {
-					if (feature.properties.text.toLowerCase().includes(search.toLowerCase())) {
-						totalMatches++;
-						if (matches.length >= maxResults) continue;
-						if (!imageBitmaps.has(imageObject.id)) {
-							imageBitmaps.set(imageObject.id, await createImageBitmap(imageObject.imageBlob));
-						}
-						const { croppedBitmap, width, height } = getClip(
-							imageBitmaps.get(imageObject.id),
-							feature
-						);
-						matches.push({
-							key: `${imageObject.id}-${featureId}`,
-							imageName: imageObject.name,
-							featureId,
-							text: feature.properties.text,
-							width,
-							height,
-							croppedBitmap
-						});
+	/** @param {ImageObject} imageObject */
+	async function searchImage(imageObject) {
+		let imageBitmap;
+		if (imageObject.features) {
+			for (const [featureId, feature] of imageObject.features.entries()) {
+				if (feature.properties.text.toLowerCase().includes(search.toLowerCase())) {
+					if (!imageBitmap) {
+						imageBitmap = await createImageBitmap(imageObject.imageBlob);
 					}
+					const { croppedBitmap, width, height } = getClip(imageBitmap, feature);
+					matches.push({
+						key: `${imageObject.id}-${featureId}`,
+						imageName: imageObject.name,
+						featureId,
+						text: feature.properties.text,
+						width,
+						height,
+						croppedBitmap
+					});
 				}
 			}
-			imageBitmaps.forEach((bitmap) => bitmap.close());
-			imageBitmaps.clear();
-		});
+		}
+		if (imageBitmap) imageBitmap.close();
+	}
+
+	const doSearch = debounce(async (/** @type {string | undefined} */ search) => {
+		matches = [];
+		searching = false;
+		if (!search) return;
+		searching = true;
+
+		db.table('images')
+			.toArray()
+			.then(async (images) => {
+				for (const image of images) await searchImage(image);
+				searching = false;
+			});
 	}, 500);
+
+	$effect(() => {
+		// `doSearch` is debounced, so set `searching` to `true` immediately
+		//  to avoid "no matches found" while typing
+		searching = true;
+		doSearch(search);
+	});
 </script>
 
 <svelte:head>
@@ -101,23 +106,23 @@
 <div class="container">
 	<div class="search">
 		<div class="search-input">
-			<Button on:click={() => doSearch(search)}>Search</Button>
-			<Search
-				bind:value={search}
-				on:keyup={(event) => {
-					if (event.key === 'Enter') doSearch(search);
-				}}
-			/>
+			<Search bind:value={search} />
 		</div>
-		<span>
-			Searching {totalFeatures.toLocaleString()} features across {totalImages.toLocaleString()} images
-			{#if totalMatches}-- found {totalMatches.toLocaleString()} matches{/if}
-		</span>
+		<div class="search-status">
+			{#if searching}
+				<InlineLoading description="Searching..." />
+			{:else if matches.length}
+				{matches.length.toLocaleString()} matches found
+			{:else if search !== ''}
+				<p>No results found for "{search}"</p>
+			{/if}
+			<span>
+				Searching {totalFeatures.toLocaleString()} features across {totalImages.toLocaleString()} images
+			</span>
+		</div>
 	</div>
 
-	{#if search && matches && matches.length === 0}
-		<p>No results found for "{search}"</p>
-	{:else if matches}
+	{#if matches}
 		<ul>
 			{#each matches as match (match.key)}
 				<li>
@@ -148,6 +153,19 @@
 
 	.search-input {
 		display: flex;
+	}
+
+	.search-status {
+		align-items: center;
+		display: flex;
+		gap: 1rem;
+		height: 1rem;
+		margin-bottom: 1rem;
+
+		span {
+			flex: 1 0 auto;
+			text-align: right;
+		}
 	}
 
 	ul {
