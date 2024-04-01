@@ -129,27 +129,48 @@
 		</div>
 	</div>
 
-	{#if matches}
-		<ul>
-			{#each matches as match (match.key)}
-				<li>
-					{match.imageName} - ({match.featureId}) {match.text}
-					<FeatureClip
-						croppedBitmap={match.croppedBitmap}
-						width={match.width}
-						height={match.height}
-					/>
-				</li>
-			{/each}
-		</ul>
+	{#if matches.length}
+		<table class="bx--data-table bx--data-table--sort">
+			<thead>
+				<tr>
+					<th aria-sort="none" scope="col" data-header="imageName">
+						<div class="bx--table-header-label">Image</div>
+					</th>
+					<th aria-sort="none" scope="col" data-header="text">
+						<div class="bx--table-header-label">Feature Text</div>
+					</th>
+					<th scope="col" data-header="clip">
+						<div class="bx--table-header-label">Clipped Image</div>
+					</th>
+				</tr>
+			</thead>
+			<tbody aria-live="polite">
+				{#each matches as match (match.key)}
+					<tr>
+						<td>
+							{match.imageName}
+						</td>
+						<td>{match.text} ({match.featureId})</td>
+						<td>
+							<FeatureClip
+								croppedBitmap={match.croppedBitmap}
+								width={match.width}
+								height={match.height}
+							/>
+						</td>
+					</tr>
+				{/each}
+			</tbody>
+		</table>
 	{/if}
 </div>
 
 <style>
 	.container {
-		height: 100%;
 		display: flex;
 		flex-direction: column;
+		height: 100%;
+		overflow: hidden;
 	}
 
 	.search {
@@ -175,16 +196,23 @@
 		}
 	}
 
-	ul {
-		list-style: disc;
-		overflow-y: auto;
-		padding: 2rem;
+	table {
+		display: block;
+		height: 100%;
+		width: 100%;
 	}
 
-	li {
-		align-items: center;
-		display: flex;
-		gap: 1rem;
-		margin: 0.5rem 0;
+	thead,
+	tbody,
+	tr {
+		display: table;
+		table-layout: fixed;
+		width: 100%;
+	}
+
+	tbody {
+		display: block;
+		height: calc(100% - 96px - 48px); /* 96px = .search height, 48px = thead height */
+		overflow: auto;
 	}
 </style>
