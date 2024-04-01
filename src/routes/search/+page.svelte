@@ -12,6 +12,9 @@
 	let search = $state();
 	let totalImages = $state(0);
 	let totalFeatures = $state(0);
+	let totalMatches = $state(0);
+
+	const maxResults = 1000;
 
 	/** @param {number[][]} coordinates */
 	const getRectangle = (coordinates) => {
@@ -57,6 +60,8 @@
 		if (imageObject.features) {
 			for (const [featureId, feature] of imageObject.features.entries()) {
 				if (feature.properties.text.toLowerCase().includes(search.toLowerCase())) {
+					totalMatches++;
+					if (matches.length >= maxResults) continue;
 					if (!imageBitmap) {
 						imageBitmap = await createImageBitmap(imageObject.imageBlob);
 					}
@@ -77,6 +82,7 @@
 	}
 
 	const doSearch = debounce(async (/** @type {string | undefined} */ search) => {
+		totalMatches = 0;
 		matches = [];
 		searching = false;
 		if (!search) return;
@@ -112,7 +118,8 @@
 			{#if searching}
 				<InlineLoading description="Searching..." />
 			{:else if matches.length}
-				{matches.length.toLocaleString()} matches found
+				{totalMatches.toLocaleString()} matches found
+				{#if totalMatches > maxResults}(max 1,000 shown){/if}
 			{:else if search !== ''}
 				<p>No results found for "{search}"</p>
 			{/if}
