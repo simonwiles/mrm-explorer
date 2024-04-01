@@ -2,6 +2,7 @@
 	import { unstate } from 'svelte';
 	import { page } from '$app/stores';
 	import { InlineLoading, Search } from 'carbon-components-svelte';
+	import ArrowsVertical from 'carbon-icons-svelte/lib/ArrowsVertical.svelte';
 	import { db } from '$lib/db';
 	import { debounce } from '$lib/debounce';
 	import FeatureClip from '@components/FeatureClip.svelte';
@@ -134,10 +135,16 @@
 			<thead>
 				<tr>
 					<th aria-sort="none" scope="col" data-header="imageName">
-						<div class="bx--table-header-label">Image</div>
+						<button type="button" class="bx--table-sort">
+							<div class="bx--table-header-label">Image</div>
+							<ArrowsVertical class="bx--table-sort__icon-unsorted" />
+						</button>
 					</th>
 					<th aria-sort="none" scope="col" data-header="text">
-						<div class="bx--table-header-label">Feature Text</div>
+						<button type="button" class="bx--table-sort">
+							<div class="bx--table-header-label">Feature Text</div>
+							<ArrowsVertical class="bx--table-sort__icon-unsorted" />
+						</button>
 					</th>
 					<th scope="col" data-header="clip">
 						<div class="bx--table-header-label">Clipped Image</div>
