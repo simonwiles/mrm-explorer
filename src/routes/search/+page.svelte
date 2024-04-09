@@ -1,9 +1,9 @@
 <script>
-	import { unstate } from 'svelte';
 	import { page } from '$app/stores';
 	import { InlineLoading, Search } from 'carbon-components-svelte';
 	import { db } from '$lib/db';
 	import { debounce } from '$lib/debounce';
+	import { getFeatureClip } from '$lib/feature-utils';
 	import FeatureClip from '@components/FeatureClip.svelte';
 
 	/** @type {FeatureMatch[]} */
@@ -15,29 +15,6 @@
 	let totalMatches = $state(0);
 
 	const maxResults = 1000;
-
-	/** @param {number[][]} coordinates */
-	const getRectangle = (coordinates) => {
-		return [
-			Math.min(...coordinates.map(([x]) => x)),
-			Math.min(...coordinates.map(([, y]) => y)),
-			Math.max(...coordinates.map(([x]) => x)),
-			Math.max(...coordinates.map(([, y]) => y))
-		];
-	};
-
-	/**
-	 * @param {ImageBitmap} imageBitmap
-	 * @param {Feature} feature
-	 */
-	const getClip = (imageBitmap, feature) => {
-		const vertices = feature.geometry.coordinates[0].map(([x, y]) => [x, 1 - y]);
-		const rect = getRectangle(unstate(vertices));
-		const height = rect[3] - rect[1];
-		const width = rect[2] - rect[0];
-		const croppedBitmap = createImageBitmap(imageBitmap, rect[0], rect[1], width, height);
-		return { croppedBitmap, width, height };
-	};
 
 	$effect(() => {
 		db.table('images').each((imageObject) => {
@@ -65,7 +42,7 @@
 					if (!imageBitmap) {
 						imageBitmap = await createImageBitmap(imageObject.imageBlob);
 					}
-					const { croppedBitmap, width, height } = getClip(imageBitmap, feature);
+					const { croppedBitmap, width, height } = getFeatureClip(imageBitmap, feature);
 					matches.push({
 						key: `${imageObject.id}-${featureId}`,
 						imageName: imageObject.name,

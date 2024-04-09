@@ -2,6 +2,7 @@
 	import { tick } from 'svelte';
 	import { panZoom } from '$lib/actions/pan-zoom';
 	import { tooltip } from '$lib/actions/tooltip';
+	import { getVertices } from '@/lib/feature-utils';
 
 	/**
 	 * @typedef {Object} ViewerProps
@@ -49,7 +50,7 @@
 			viewBox={`0 0 ${imageObject.width} ${imageObject.height}`}
 		>
 			{#each imageObject.features || [] as feature, i}
-				{@const vertices = feature.geometry.coordinates[0].map(([x, y]) => [x, 1 - y])}
+				{@const vertices = getVertices(feature)}
 				<path
 					d={`M ${vertices[0][0]} ${vertices[0][1]} ${vertices
 						.slice(1)
