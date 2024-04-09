@@ -26,6 +26,7 @@ __version__ = "0.1"
 
 import json
 import logging
+import math
 import re
 from pathlib import Path
 from typing import List
@@ -125,8 +126,10 @@ def convert(
         [orig_res, target_res] = scale_resolution.split("-")
         [orig_h, orig_w] = orig_res.split("x")
         [target_h, target_w] = target_res.split("x")
-        assert float(orig_h) / float(orig_w) == float(target_h) / float(
-            target_w
+        assert math.isclose(
+            float(orig_h) / float(orig_w),
+            float(target_h) / float(target_w),
+            rel_tol=1e-5,
         ), "Invalid scale resolution"
         scale_factor = float(target_w) / float(orig_w)
 
