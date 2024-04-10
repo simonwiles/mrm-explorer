@@ -29,8 +29,6 @@
 			imageObject = null;
 		}
 	});
-
-	$inspect(imageObject);
 </script>
 
 <svelte:head>

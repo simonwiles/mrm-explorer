@@ -1,7 +1,13 @@
-/** @param {Feature} feature */
+/**
+ * @param {Feature} feature
+ * @returns {number[][]}
+ */
 export const getVertices = (feature) => feature.geometry.coordinates[0].map(([x, y]) => [x, 1 - y]);
 
-/** @param {number[][]} coordinates */
+/**
+ * @param {number[][]} coordinates
+ * @returns {number[]}
+ */
 export const getRectangle = (coordinates) => {
 	return [
 		Math.min(...coordinates.map(([x]) => x)),
@@ -14,6 +20,7 @@ export const getRectangle = (coordinates) => {
 /**
  * @param {ImageBitmap} imageBitmap
  * @param {Feature} feature
+ * @returns {{croppedBitmap: Promise<ImageBitmap>, width: number, height: number}}
  */
 export const getFeatureClip = (imageBitmap, feature) => {
 	const vertices = getVertices(feature);
