@@ -2,20 +2,23 @@
 	import { tick } from 'svelte';
 	import { panZoom } from '$lib/actions/pan-zoom';
 	import { tooltip } from '$lib/actions/tooltip';
-	import { getVertices } from '@/lib/feature-utils';
+	import { getCenter, getVertices } from '@/lib/feature-utils';
 
 	/**
 	 * @typedef {Object} ViewerProps
 	 * @property {ImageObject} imageObject Image object to view
 	 * @property {string | function} [search] String to search for or callback function to use for marking features
 	 * @property {function} [setMarkedCount] Callback which will be called when the number of matched features is updated
+	 * @property {number} [featureId]
 	 */
 
 	/** @type {ViewerProps} */
-	let { imageObject, search, setMarkedCount } = $props();
+	let { imageObject, search, setMarkedCount, featureId } = $props();
 
 	/** @type {function} */
 	let markFeature = $state(() => false);
+	let panzoomOuter = $state();
+	let panzoomContainer = $state();
 
 	let markedCount = 0;
 
@@ -36,12 +39,31 @@
 		};
 		if (setMarkedCount) tick().then(() => /** @type {function} */ (setMarkedCount)(markedCount));
 	});
+
+	/** @param {Feature} feature */
+	const panToFeature = (feature) => {
+		const dim = panzoomOuter.getBoundingClientRect();
+		const r = dim.height / imageObject.height;
+		const { x, y } = getCenter(feature);
+		const rx = x - imageObject.width / 2;
+		const ry = y - imageObject.height / 2;
+		panzoomContainer.panzoom.pan(-rx * r, -ry * r, { relative: false, animate: true });
+	};
+
+	$effect(() => {
+		if (!featureId || !imageObject.features) return;
+		const focusedFeature = imageObject.features[featureId];
+		if (!focusedFeature) return;
+		panzoomContainer.panzoom.zoom(5); // TODO: the zoom level should take account of the feature size somehow
+		setTimeout(() => panToFeature(focusedFeature));
+	});
 </script>
 
-<div class="outer">
+<div class="panzoom-outer" bind:this={panzoomOuter}>
 	<div
 		class="panzoom-container"
 		use:panZoom
+		bind:this={panzoomContainer}
 		style="--aspect-ratio: {imageObject.width} / {imageObject.height}"
 	>
 		<img src={URL.createObjectURL(imageObject.imageBlob)} alt={imageObject.name} />
@@ -62,6 +84,12 @@
 					data-tippy-content={`text: ${feature.properties.text}<br>score: ${feature.properties.score}`}
 					use:tooltip={{ allowHTML: true }}
 					class:marked={markFeature(feature.properties)}
+					class:focused={featureId == i}
+					role="button"
+					tabindex="0"
+					onclick={() => panToFeature(feature)}
+					onkeydown={(/** @type {KeyboardEvent} */ { key }) =>
+						(key === 'Enter' || key === ' ') && panToFeature(feature)}
 				/>
 			{/each}
 		</svg>
@@ -69,13 +97,14 @@
 </div>
 
 <style>
-	.outer {
+	.panzoom-outer {
 		height: 100%;
 		width: 100%;
 	}
 
 	.panzoom-container {
-		aspect-ratio: var(--aspect-ratio);
+		display: flex;
+		justify-content: center;
 		height: 100%;
 		overflow: hidden;
 		position: relative;
@@ -87,11 +116,12 @@
 		}
 
 		svg {
-			left: 0;
-			max-height: 100%;
-			max-width: 100%;
+			left: 50%;
+			height: 100%;
+			width: 100%;
 			position: absolute;
-			top: 0;
+			top: 50%;
+			translate: -50% -50%;
 		}
 
 		svg :global(path) {
@@ -100,7 +130,8 @@
 			stroke-width: 6px;
 		}
 
-		svg :global(path.marked) {
+		svg :global(path.marked),
+		svg :global(path.focused) {
 			opacity: 0.6;
 			stroke: lime;
 		}
