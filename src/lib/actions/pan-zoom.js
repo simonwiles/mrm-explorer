@@ -14,6 +14,7 @@ export function panZoom(node) {
 		minScale: 1,
 		maxScale: 20
 	});
+	node.panzoom = panzoom;
 	const parent = node.parentElement;
 	if (parent === null) {
 		throw new Error('PanZoom node has no parent element');
