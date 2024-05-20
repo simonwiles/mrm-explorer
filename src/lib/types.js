@@ -1,12 +1,12 @@
 /**
  * @typedef {Object} ImageObject
- * @property {number} [id] internal database id
+ * @property {number} id internal database id
  * @property {string} name name of the image
  * @property {Blob} imageBlob binary image blob
- * @property {Blob} [imageThumbBlob] binary image blob for a thumbnail image ()
+ * @property {Blob} imageThumbBlob binary image blob for a thumbnail image ()
  * @property {Array<Feature>} [features] the `features` property of the MRM GeoJSON
- * @property {number} [width]
- * @property {number} [height]
+ * @property {number} width
+ * @property {number} height
  */
 
 /**
@@ -30,6 +30,7 @@
 
 /** @typedef {Object} FeatureMatch
  * @property {string} key
+ * @property {number} imageId
  * @property {string} imageName
  * @property {number} featureId
  * @property {string} text

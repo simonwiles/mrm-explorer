@@ -47,6 +47,7 @@
 
 			channel.port2.onmessage = ({ data: imageThumbBlob }) => {
 				addImageToDb({
+					id: -1,
 					name,
 					imageBlob,
 					width: img.naturalWidth,
