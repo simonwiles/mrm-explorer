@@ -1,4 +1,5 @@
 <script>
+	import { base } from '$app/paths';
 	import { page } from '$app/stores';
 	import { InlineLoading, Search } from 'carbon-components-svelte';
 	import { db } from '$lib/db';
@@ -45,6 +46,7 @@
 					const { croppedBitmap, width, height } = getFeatureClip(imageBitmap, feature);
 					matches.push({
 						key: `${imageObject.id}-${featureId}`,
+						imageId: imageObject.id,
 						imageName: imageObject.name,
 						featureId,
 						text: feature.properties.text,
@@ -129,11 +131,13 @@
 						</td>
 						<td>{match.text} ({match.featureId})</td>
 						<td>
-							<FeatureClip
-								croppedBitmap={match.croppedBitmap}
-								width={match.width}
-								height={match.height}
-							/>
+							<a href={`${base}/view/?id=${match.imageId}&feat=${match.featureId}`}>
+								<FeatureClip
+									croppedBitmap={match.croppedBitmap}
+									width={match.width}
+									height={match.height}
+								/>
+							</a>
 						</td>
 					</tr>
 				{/each}
