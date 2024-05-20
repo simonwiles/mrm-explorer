@@ -55,13 +55,13 @@
 					<dt>Name</dt>
 					<dd>{imageObject.name}</dd>
 					<dt>Image Dimensions:</dt>
-					<dd>{imageObject.width} x {imageObject.height}px</dd>
+					<dd>{imageObject.width.toLocaleString()} x {imageObject.height.toLocaleString()}px</dd>
 					<dt>Image Size:</dt>
 					<dd>{formatBytes(imageObject.imageBlob.size)}</dd>
 					<dt>Feature Count</dt>
 					<dd>
 						{#if imageObject.features}
-							{imageObject.features.length}
+							{imageObject.features.length.toLocaleString()}
 						{:else}
 							<AddFeaturesFromJson {imageObject} />
 						{/if}
