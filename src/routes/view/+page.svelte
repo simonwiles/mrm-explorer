@@ -10,6 +10,7 @@
 
 	/** @type {ImageObject | undefined | null} */
 	let imageObject = $state();
+	let featureId = $state();
 
 	let search = $state();
 	let markedCount = $state(0);
@@ -20,6 +21,7 @@
 	$effect(() => {
 		if (imageObject) return;
 		const idStr = $page.url.searchParams.get('id');
+		featureId = $page.url.searchParams.get('feat');
 		let id;
 		if (idStr !== null && (id = parseInt(idStr, 10))) {
 			// Promised resolves with undefined if not found
@@ -79,7 +81,7 @@
 				{/if}
 			</div>
 		</div>
-		<Viewer {imageObject} {search} {setMarkedCount} />
+		<Viewer {imageObject} {search} {setMarkedCount} {featureId} />
 	</div>
 {/if}
 
