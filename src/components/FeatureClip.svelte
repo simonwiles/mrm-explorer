@@ -17,9 +17,9 @@
 	$effect(() => {
 		canvas.width = width;
 		canvas.height = height;
-		const ctx = canvas.getContext('bitmaprenderer');
+		const ctx = canvas.getContext('2d');
 		croppedBitmap.then((croppedBitmap) => {
-			ctx.transferFromImageBitmap(croppedBitmap);
+			ctx.drawImage(croppedBitmap, 0, 0);
 			croppedBitmap.close();
 			canvasReady = true;
 		});
