@@ -1,7 +1,8 @@
 <script>
 	import { base } from '$app/paths';
 	import { page } from '$app/stores';
-	import { InlineNotification, Link, Loading, Search } from 'carbon-components-svelte';
+	import { Button, InlineNotification, Link, Loading, Search } from 'carbon-components-svelte';
+	import JumpLink from 'carbon-icons-svelte/lib/JumpLink.svelte';
 
 	import { fetchImageObjectById } from '$lib/db';
 	import { formatBytes } from '$lib/storage';
@@ -14,6 +15,8 @@
 
 	let search = $state();
 	let markedCount = $state(0);
+
+	let viewer = $state();
 
 	/** @param {number} count */
 	const setMarkedCount = (count) => (markedCount = count);
@@ -73,7 +76,22 @@
 				{#if search}
 					<span class="marked-count">
 						{#if markedCount}
-							{markedCount} feature{markedCount > 1 ? 's' : ''} marked
+							<div>
+								{markedCount} feature{markedCount > 1 ? 's' : ''} marked
+								<Button
+									size="small"
+									iconDescription="Jump to next feature"
+									icon={JumpLink}
+									{...{
+										/* Using the old-style Svelte event handler syntax here;
+										 * using the native handled (in the Svelte 5 style) is
+										 * resulting in dropped or delayed events, for reasons
+										 * I don't understand :(
+										 */
+									}}
+									on:click={viewer.panToNextMarked}
+								/>
+							</div>
 						{:else}
 							No features matched!
 						{/if}
@@ -81,7 +99,7 @@
 				{/if}
 			</div>
 		</div>
-		<Viewer {imageObject} {search} {setMarkedCount} {featureId} />
+		<Viewer {imageObject} {search} {setMarkedCount} {featureId} bind:this={viewer} />
 	</div>
 {/if}
 
@@ -120,5 +138,11 @@
 
 	.marked-count {
 		white-space: nowrap;
+
+		& > div {
+			display: flex;
+			align-items: center;
+			gap: 0.5rem;
+		}
 	}
 </style>
