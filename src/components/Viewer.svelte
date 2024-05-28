@@ -50,6 +50,26 @@
 		panzoomContainer.panzoom.pan(-rx * r, -ry * r, { relative: false, animate: true });
 	};
 
+	export const panToNextMarked = () => {
+		if (!imageObject.features) return;
+		const marks = [...panzoomContainer.querySelectorAll('.marked')];
+		let active = panzoomContainer.querySelector('.active');
+		let nextMark;
+		if (active) {
+			active.classList.remove('active');
+			const focusedIdx = marks.indexOf(active);
+			const nextIdx = (focusedIdx + 1) % marks.length;
+			nextMark = marks[nextIdx];
+		} else {
+			nextMark = marks[0];
+		}
+		if (!nextMark) return;
+		nextMark.classList.add('active');
+		const feature = imageObject.features[nextMark.dataset.idx];
+		panzoomContainer.panzoom.zoom(5);
+		setTimeout(() => panToFeature(feature), 1);
+	};
+
 	$effect(() => {
 		if (!featureId || !imageObject.features) return;
 		const focusedFeature = imageObject.features[featureId];
