@@ -67,7 +67,10 @@
 		nextMark.classList.add('active');
 		const feature = imageObject.features[nextMark.dataset.idx];
 		panzoomContainer.panzoom.zoom(5);
-		setTimeout(() => panToFeature(feature), 1);
+		setTimeout(() => {
+			panToFeature(feature);
+			if (nextMark._tippy) setTimeout(() => nextMark._tippy.show(), 300);
+		});
 	};
 
 	$effect(() => {
