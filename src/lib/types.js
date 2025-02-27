@@ -1,6 +1,6 @@
 /**
  * @typedef {Object} ImageObject
- * @property {number} id internal database id
+ * @property {number} [id] internal database id (may be empty before insertion)
  * @property {string} name name of the image
  * @property {Blob} imageBlob binary image blob
  * @property {Blob} imageThumbBlob binary image blob for a thumbnail image ()
