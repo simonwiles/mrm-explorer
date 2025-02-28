@@ -59,6 +59,7 @@
 	}
 
 	&:hover,
+	&.bx--side-nav__link--current,
 	&[aria-current='page'] {
 		background-color: var(--g90-body-background);
 	}
