@@ -14,6 +14,7 @@
 	let totalImages = $state(0);
 	let totalFeatures = $state(0);
 	let totalMatches = $state(0);
+	let matchedImages = $state(new Set());
 
 	const maxResults = 1000;
 
@@ -38,6 +39,7 @@
 		if (imageObject.features) {
 			for (const [featureId, feature] of imageObject.features.entries()) {
 				if (feature.properties.text.toLowerCase().includes(search.toLowerCase())) {
+					matchedImages.add(imageObject.id);
 					totalMatches++;
 					if (matches.length >= maxResults) continue;
 					if (!imageBitmap) {
@@ -62,6 +64,7 @@
 
 	const doSearch = debounce(async (/** @type {string | undefined} */ search) => {
 		totalMatches = 0;
+		matchedImages = new Set();
 		matches = [];
 		searching = false;
 		if (!search) return;
@@ -97,7 +100,7 @@
 			{#if searching}
 				<InlineLoading description="Searching..." />
 			{:else if matches.length}
-				{totalMatches.toLocaleString()} matches found
+				{totalMatches.toLocaleString()} matches found in {matchedImages.size} image(s)
 				{#if totalMatches > maxResults}(max 1,000 shown){/if}
 			{:else if search !== ''}
 				<p>No results found for "{search}"</p>
