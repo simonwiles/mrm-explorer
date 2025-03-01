@@ -1,4 +1,4 @@
-<script context="module">
+<script module>
 	let open = $state();
 	let detail = $state();
 	let content = $state();

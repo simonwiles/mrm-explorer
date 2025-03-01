@@ -29,7 +29,7 @@
 {#if !canvasReady}
 	<Loading withOverlay={false} small />
 {/if}
-<canvas bind:this={canvas} class:loaded={canvasReady} />
+<canvas bind:this={canvas} class:loaded={canvasReady}></canvas>
 
 <style>
 	canvas {

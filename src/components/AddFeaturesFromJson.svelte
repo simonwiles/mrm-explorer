@@ -1,5 +1,5 @@
 <script>
-	import { tick, unstate } from 'svelte';
+	import { tick } from 'svelte';
 	import { FileUploaderDropContainer } from 'carbon-components-svelte';
 	import { upsertImageObject } from '$lib/db';
 
@@ -13,7 +13,7 @@
 		imageObject.features = mrmGeoJson.features;
 		await tick();
 		// createFeaturePaths(mrmGeoJson.features);
-		upsertImageObject(unstate(imageObject));
+		upsertImageObject($state.snapshot(imageObject));
 	}
 </script>
 
