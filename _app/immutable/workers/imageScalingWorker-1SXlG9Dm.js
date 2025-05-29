@@ -1,0 +1,1 @@
+(function(){"use strict";onmessage=async function(o){const{imageBlob:c,w:e,h:n}=o.data,g=o.ports[0],t=new OffscreenCanvas(e,n),s=t.getContext("2d");t.width=e,t.height=n,createImageBitmap(c).then(a=>{s==null||s.drawImage(a,0,0,e,n)}).then(()=>{t.convertToBlob().then(a=>g.postMessage(a))})}})();
