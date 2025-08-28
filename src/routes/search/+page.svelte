@@ -87,8 +87,8 @@
 </script>
 
 <svelte:head>
-	<title>Search | MRM Explorer</title>
-	<meta name="description" content="Application for investigating MRM outputs" />
+	<title>Search | Map ATR Explorer</title>
+	<meta name="description" content="Application for investigating MapReader Text-Spotter outputs" />
 </svelte:head>
 
 <div class="container">

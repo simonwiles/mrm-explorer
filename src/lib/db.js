@@ -1,7 +1,7 @@
 import '$lib/types.js';
 import Dexie, { liveQuery } from 'dexie';
 
-export const db = new Dexie('mrmExplorer');
+export const db = new Dexie('map-atr-explorer');
 db.version(1).stores({
 	images: '++id, name'
 });

@@ -37,8 +37,8 @@
 </script>
 
 <svelte:head>
-	<title>{imageObject ? `${imageObject.name}` : 'Viewer'} | MRM Explorer</title>
-	<meta name="description" content="Application for investigating MRM outputs" />
+	<title>{imageObject ? `${imageObject.name}` : 'Viewer'} | Map ATR Explorer</title>
+	<meta name="description" content="Application for investigating MapReader Text-Spotter outputs" />
 </svelte:head>
 
 {#if imageObject === null}

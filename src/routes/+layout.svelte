@@ -24,7 +24,7 @@
 	let isSideNavOpen = false;
 </script>
 
-<Header platformName="MRM Explorer" bind:isSideNavOpen>
+<Header platformName="Map ATR Explorer" bind:isSideNavOpen>
 	<img slot="company" src={logo} alt="Stanford University Libraries" class="sul-logo" />
 	<svelte:fragment slot="skip-to-content">
 		<SkipToContent />
@@ -50,7 +50,7 @@
 		<SideNavLink
 			icon={LogoGithub}
 			text="GitHub"
-			href="https://github.com/simonwiles/mrm-explorer"
+			href="https://github.com/sul-rds/map-atr-explorer"
 		/>
 	</SideNavItems>
 </SideNav>

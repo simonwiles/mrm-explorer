@@ -56,8 +56,8 @@
 </script>
 
 <svelte:head>
-	<title>Dataset | MRM Explorer</title>
-	<meta name="description" content="Application for investigating MRM outputs" />
+	<title>Dataset | Map ATR Explorer</title>
+	<meta name="description" content="Application for investigating MapReader Text-Spotter outputs" />
 </svelte:head>
 
 <div class="container">
@@ -124,7 +124,7 @@
 				{:else if cell.key === 'actions'}
 					<OverflowMenu flipped>
 						<OverflowMenuItem text="View" href={`${base}/view/?id=${row.id}`} />
-						<OverflowMenuItem text="Add/Update Features from MRM GeoJSON" />
+						<OverflowMenuItem text="Add/Update Features from MATRE GeoJSON" />
 						<OverflowMenuItem
 							danger
 							text="Delete Features"

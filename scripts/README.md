@@ -8,13 +8,14 @@
 
  Usage: luna-to-geojson.py [OPTIONS] COMMAND [ARGS]...
 
- Convert JSON files downloaded from Luna to a GeoJSON format that apes the MRM output.
+ Convert JSON files downloaded from Luna to a GeoJSON format that is suitable for use
+    with the Map ATR Explorer.
  ---
 
  Notes:
  * Luna JSON files may (and typically do?) contain multiple "annotation" items -- this
    function just takes the first one (in what I've looked at so far, this first one is
-   the MRM output and the second one is a manual correction).
+   the Text-Spotter output and the second one is a manual correction).
 
  * Coordinates are extracted from the SVG selector.  If the selector is not of type
    "SvgSelector", it is skipped.  (I've only seen one such example so far, where one

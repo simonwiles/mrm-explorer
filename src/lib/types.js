@@ -4,7 +4,7 @@
  * @property {string} name name of the image
  * @property {Blob} imageBlob binary image blob
  * @property {Blob} imageThumbBlob binary image blob for a thumbnail image ()
- * @property {Array<Feature>} [features] the `features` property of the MRM GeoJSON
+ * @property {Array<Feature>} [features] the `features` property of the MATRE GeoJSON
  * @property {number} width
  * @property {number} height
  */

@@ -1,6 +1,6 @@
 {
-	"name": "mrm-explorer",
-	"version": "0.0.1",
+	"name": "map-atr-explorer",
+	"version": "0.1.0",
 	"private": true,
 	"scripts": {
 		"dev": "vite dev",

@@ -1,13 +1,14 @@
 #!/usr/bin/env python3
 
-""" Convert JSON files downloaded from Luna to a GeoJSON format that apes the MRM output.
+""" Convert JSON files downloaded from Luna to a GeoJSON format that is suitable for use
+    with the Map ATR Explorer.
 
     ---
 
     Notes: 
     * Luna JSON files may (and typically do?) contain multiple "annotation" items -- this
       function just takes the first one (in what I've looked at so far, this first one is
-      the MRM output and the second one is a manual correction).
+      the Text-Spotter output and the second one is a manual correction).
 
     * Coordinates are extracted from the SVG selector.  If the selector is not of type
       "SvgSelector", it is skipped.  (I've only seen one such example so far, where one
@@ -140,13 +141,13 @@ def convert(
         for feature in parse_features_from_luna_json(luna_json_file, scale_factor)
     ]
 
-    mrm_style_geojson = {"type": "FeatureCollection", "features": features}
+    matre_style_geojson = {"type": "FeatureCollection", "features": features}
 
     if output_file:
         with open(output_file, "w", encoding="utf-8") as _fh:
-            json.dump(mrm_style_geojson, _fh, indent=2)
+            json.dump(matre_style_geojson, _fh, indent=2)
     else:
-        print(json.dumps(mrm_style_geojson, indent=2))
+        print(json.dumps(matre_style_geojson, indent=2))
 
 
 if __name__ == "__main__":

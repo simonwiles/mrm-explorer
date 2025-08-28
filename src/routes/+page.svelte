@@ -5,18 +5,19 @@
 	import { countImageObjects } from '$lib/db';
 	import { formatBytes, storageUsage } from '$lib/storage';
 	import AddNewImages from '@components/AddNewImages.svelte';
+	import { Explore } from 'carbon-icons-svelte';
 
 	const countPromise = countImageObjects();
 	const storageUsagePromise = storageUsage();
 </script>
 
 <svelte:head>
-	<title>MRM Explorer</title>
-	<meta name="description" content="Application for investigating MRM outputs" />
+	<title>Map ATR Explorer</title>
+	<meta name="description" content="Application for investigating MapReader Text-Spotter outputs" />
 </svelte:head>
 
 <section>
-	<h1>MRM Explorer</h1>
+	<h1>Map ATR Explorer</h1>
 
 	{#await countPromise}
 		<Loading withOverlay={false} />

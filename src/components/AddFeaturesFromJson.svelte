@@ -7,12 +7,12 @@
 	let { imageObject } = $props();
 
 	/**
-	 * @param {{features: Array<Feature>}} mrmGeoJson
+	 * @param {{features: Array<Feature>}} matreGeoJson
 	 */
-	async function addFeaturesToImage(mrmGeoJson) {
-		imageObject.features = mrmGeoJson.features;
+	async function addFeaturesToImage(matreGeoJson) {
+		imageObject.features = matreGeoJson.features;
 		await tick();
-		// createFeaturePaths(mrmGeoJson.features);
+		// createFeaturePaths(matreGeoJson.features);
 		upsertImageObject($state.snapshot(imageObject));
 	}
 </script>
