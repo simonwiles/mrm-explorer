@@ -33,7 +33,7 @@
 			const mark =
 				typeof search === 'function'
 					? search(featureProps)
-					: featureProps.text.toLowerCase().includes(/** @type string */ (search));
+					: featureProps.text.toLowerCase().includes(search.toLowerCase());
 			if (mark) markedCount++;
 			return mark;
 		};
