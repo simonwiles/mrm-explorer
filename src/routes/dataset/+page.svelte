@@ -124,17 +124,17 @@
 				{:else if cell.key === 'actions'}
 					<OverflowMenu flipped>
 						<OverflowMenuItem text="View" href={`${base}/view/?id=${row.id}`} />
-						<OverflowMenuItem text="Add/Update Features from MATRE GeoJSON" />
+						<OverflowMenuItem text="Add/Update Features from MATRE GeoJSON" disabled />
 						<OverflowMenuItem
 							danger
 							text="Delete Features"
 							disabled={!row.features}
-							onclick={() => clearFeatures(/** @type {ImageObject} */ (row))}
+							on:click={() => clearFeatures(/** @type {ImageObject} */ (row))}
 						/>
 						<OverflowMenuItem
 							danger
 							text="Delete Image"
-							onclick={() => removeImage(/** @type {ImageObject & { id: number }} */ (row))}
+							on:click={() => removeImage(/** @type {ImageObject & { id: number }} */ (row))}
 						/>
 					</OverflowMenu>
 				{:else}
